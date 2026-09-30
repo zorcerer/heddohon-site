@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<title>Heddohon, a self-hosted music player</title>
+		<meta
+			name="description"
+			content="Heddohon is a web music player you host yourself, for Navidrome, Subsonic and Jellyfin. Original files up to FLAC 24/192, synced lyrics, shared links and listening together."
+		/>
+		<meta name="theme-color" content="#0b0c0f" />
+		<link rel="canonical" href="https://heddohon.app/" />
+		<link rel="icon" href="assets/favicon.svg" />
+		<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+		<link rel="preload" href="assets/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://heddohon.app/" />
+		<meta property="og:title" content="Heddohon" />
+		<meta property="og:description" content="A web music player you host yourself, for Navidrome, Subsonic and Jellyfin." />
+		<meta property="og:image" content="https://heddohon.app/assets/social-preview.png" />
+		<meta name="twitter:card" content="summary_large_image" />
+
+		<!-- The saved theme is applied before the first paint, so Paper does not
+		     arrive as a flash of Liquid. -->
+		<script>
+			try {
+				if (localStorage.getItem('hh-theme') === 'light') document.documentElement.dataset.theme = 'light';
+			} catch {}
+		</script>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="room" aria-hidden="true"></div>
+
+		<header class="bar glass float">
+			<a class="brand" href="#top" aria-label="Heddohon, top of the page">
+				<svg class="crest" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+					<circle cx="16" cy="16" r="13.6" stroke="currentColor" stroke-width="1.8" />
+					<path d="M8.98 19.27A7.75 7.75 0 1 1 23.02 19.27" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" />
+					<rect x="6.62" y="17.9" width="4.72" height="8.3" rx="2.36" fill="currentColor" />
+					<rect x="20.66" y="17.9" width="4.72" height="8.3" rx="2.36" fill="currentColor" />
+				</svg>
+				<span>Heddohon</span>
+			</a>
+			<nav aria-label="Sections">
+				<a href="#features">Features</a>
+				<a href="#screens">Screens</a>
+				<a href="#install">Install</a>
+				<a href="#docs">Docs</a>
+			</nav>
+			<button class="key theme" type="button" aria-label="Switch theme" title="Switch between Liquid and Paper">
+				<span class="theme-name" data-for="dark">Liquid</span>
+				<span class="theme-name" data-for="light">Paper</span>
+			</button>
+			<a class="key" href="https://github.com/zorcerer/heddohon" aria-label="Source on GitHub" title="Source on GitHub">
+				<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+			</a>
+		</header>
+
+		<main id="top">
+			<section class="hero">
+				<div class="hero-text">
+					<p class="eyebrow">ヘッドホン · headphones</p>
+					<h1>Heddohon</h1>
+					<p class="lede">A web music player you host yourself,<br /><span>for Navidrome, Subsonic and Jellyfin.</span></p>
+					<p class="chips">
+						<span class="chip chip--hires">FLAC 24/192</span>
+						<span class="chip">amd64 · arm64</span>
+						<span class="chip">MIT</span>
+					</p>
+					<p class="actions">
+						<a class="key key--primary" href="#install">
+							<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M4 2.5v11l9-5.5z" /></svg>
+							Install
+						</a>
+						<a class="key" href="https://github.com/zorcerer/heddohon/releases">Releases</a>
+						<a class="key" href="https://github.com/zorcerer/heddohon">Source</a>
+					</p>
+				</div>
+				<figure class="sleeve" data-tint>
+					<div class="sleeve-turn">
+						<img
+							src="assets/shots/album.jpg"
+							width="1800"
+							height="1200"
+							alt="Heddohon showing an album page, with the track list in the middle and the now-playing panel on the right, both tinted by the cover"
+						/>
+						<span class="sheen" aria-hidden="true"></span>
+					</div>
+				</figure>
+			</section>
+
+			<section class="route" aria-label="How requests travel">
+				<pre><span>browser</span> ──► <b>Heddohon</b> ──► <span>Navidrome / Jellyfin</span></pre>
+				<p>
+					Heddohon signs in to your music server from its own backend and proxies the audio and the artwork. The
+					browser only talks to Heddohon, and your upstream credentials stay on the server.
+				</p>
+			</section>
+
+			<section id="features" class="section">
+				<h2 class="section-head"><span class="index">01</span>Features<span class="rule"></span></h2>
+				<ol class="index-list">
+					<li>
+						<div><h3>Original files</h3><p>Up to FLAC 24/192, with the decoded format shown in the player. Optional transcoding to MP3, Opus or AAC, switched from the quality badge. Casts to Chromecast from Chrome on Android and to AirPlay from Safari.</p></div>
+						<span class="chip">24/192</span>
+					</li>
+					<li>
+						<div><h3>Coloured by the artwork</h3><p>The interface takes its accent from the cover that is playing, in two themes: Liquid (dark glass) and Paper (parchment and ink). This page does the same with the screenshots on it; the switch is in the top bar.</p></div>
+						<span class="chip">2 themes</span>
+					</li>
+					<li>
+						<div><h3>Library</h3><p>Albums, artists, genres, playlists, favourites and the folders on disk, with synced lyrics and recommendations from your music server. Playlists reorder by dragging or with the arrow keys. Ratings of one to five stars on Navidrome.</p></div>
+						<span class="chip">lyrics</span>
+					</li>
+					<li>
+						<div><h3>Instant mix</h3><p>Up to 100 similar tracks from a track, an album or an artist, with AudioMuse-AI's sonic similarity where it is installed.</p></div>
+						<span class="chip">100 tracks</span>
+					</li>
+					<li>
+						<div><h3>Shared links and listening together</h3><p>Links to songs, albums and playlists that anyone can play without an account, for 1, 7 or 30 days. A live link plays what you play, as you play it, with reactions.</p></div>
+						<span class="chip">1 · 7 · 30 d</span>
+					</li>
+					<li>
+						<div><h3>Phones and living rooms</h3><p>On a phone the navigation and the player share one panel at the foot of the screen, and the full player pulls down to close. A living-room screen shows what plays full screen with the synced lyrics.</p></div>
+						<span class="chip">PWA</span>
+					</li>
+					<li>
+						<div><h3>Across devices</h3><p>The queue and settings sync between browsers. One browser can pause, skip or seek another signed in to the same account, and move the queue to it. Installs as an app on phones and desktops.</p></div>
+						<span class="chip">sync</span>
+					</li>
+					<li>
+						<div><h3>Crossfade and equaliser</h3><p>Both off until switched on. Tracks that follow each other on an album get a tight handoff instead of the crossfade. The 10-band equaliser is kept per browser.</p></div>
+						<span class="chip">10 bands</span>
+					</li>
+					<li>
+						<div><h3>History</h3><p>Scrobbling to Last.fm and ListenBrainz through Navidrome, ReplayGain, a sleep timer. Every play is kept on your own server, summed up as top artists, albums, tracks and hours, with the albums played on this date in earlier years.</p></div>
+						<span class="chip">scrobble</span>
+					</li>
+					<li>
+						<div><h3>SQLite or PostgreSQL</h3><p>SQLite by default, PostgreSQL when configured, with a one-time import from SQLite.</p></div>
+						<span class="chip">db</span>
+					</li>
+				</ol>
+			</section>
+
+			<section id="screens" class="section">
+				<h2 class="section-head"><span class="index">02</span>Screens<span class="rule"></span></h2>
+				<div class="shots">
+					<figure class="shot" data-tint>
+						<img src="assets/shots/lyrics.jpg" loading="lazy" alt="Synced lyrics in the now-playing panel, the current line highlighted" />
+						<figcaption><span class="index">a</span>Synced lyrics, in place of the artwork</figcaption>
+					</figure>
+					<figure class="shot" data-tint>
+						<img src="assets/shots/recommendations.jpg" loading="lazy" alt="An album page with more from the artist below the track list" />
+						<figcaption><span class="index">b</span>More from the artist, under the track list</figcaption>
+					</figure>
+					<figure class="shot shot--wide" data-tint>
+						<img src="assets/shots/share.jpg" loading="lazy" alt="A shared song, playing in the browser without an account" />
+						<figcaption><span class="index">c</span>A shared song, for anyone with the link</figcaption>
+					</figure>
+				</div>
+			</section>
+
+			<section id="install" class="section">
+				<h2 class="section-head"><span class="index">03</span>Install<span class="rule"></span></h2>
+				<div class="install">
+					<div class="terminal glass float">
+						<div class="terminal-top">
+							<span class="label">docker compose</span>
+							<button class="key key--small copy" type="button" data-copy="quickstart">Copy</button>
+						</div>
+<pre id="quickstart"><code>git clone https://github.com/zorcerer/heddohon.git && cd heddohon
+cp .env.example .env
+echo "HEDDOHON_SECRET=$(openssl rand -base64 48)" >> .env
+echo "HEDDOHON_SUBSONIC_URL=http://10.0.0.10:4533" >> .env
+docker compose up -d</code></pre>
+					</div>
+					<dl class="facts">
+						<div><dt>Open</dt><dd><code>http://localhost:3000</code>, and sign in with your music server account. To expose it publicly, set <code>ORIGIN</code> and read <a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md">SECURITY.md</a>.</dd></div>
+						<div><dt>Images</dt><dd><code>ghcr.io/zorcerer/heddohon</code> and <code>zorcererd/heddohon</code></dd></div>
+						<div><dt>Platforms</dt><dd><code>linux/amd64</code> and <code>linux/arm64</code>: a Raspberry Pi 4 or 5 on a 64-bit OS, an ARM NAS, an Ampere server. 32-bit ARM is not built.</dd></div>
+						<div><dt>Tags</dt><dd><code>latest</code> is the newest release. <code>dev</code> is built from the <code>dev</code> branch once a day when it has changed and passed the test suites.</dd></div>
+						<div><dt>Unraid</dt><dd>A template is in <a href="https://github.com/zorcerer/heddohon/blob/main/templates/heddohon.xml"><code>templates/heddohon.xml</code></a>.</dd></div>
+						<div><dt>No Docker</dt><dd>On Node 22 or later: <code>npm ci && npm run build && node build/index.js</code></dd></div>
+					</dl>
+				</div>
+			</section>
+
+			<section id="docs" class="section">
+				<h2 class="section-head"><span class="index">04</span>Documentation<span class="rule"></span></h2>
+				<ul class="docs">
+					<li><a href="https://github.com/zorcerer/heddohon/blob/main/docs/configuration.md"><span>Configuration</span><span class="leader"></span><em>Environment variables, reverse proxies, PostgreSQL, Unraid</em></a></li>
+					<li><a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md"><span>Security</span><span class="leader"></span><em>Threat model, known gaps, reporting a vulnerability</em></a></li>
+					<li><a href="https://github.com/zorcerer/heddohon/blob/main/docs/audio.md"><span>Audio</span><span class="leader"></span><em>Formats, transcoding, and what high resolution means in a browser</em></a></li>
+					<li><a href="https://github.com/zorcerer/heddohon/blob/main/docs/architecture.md"><span>Architecture</span><span class="leader"></span><em>How the server, the client and the music server fit together</em></a></li>
+					<li><a href="https://github.com/zorcerer/heddohon/blob/main/docs/design.md"><span>Design notes</span><span class="leader"></span><em>Why the interface looks and behaves as it does</em></a></li>
+					<li><a href="https://github.com/zorcerer/heddohon/blob/main/CONTRIBUTING.md"><span>Contributing</span><span class="leader"></span><em>Reporting bugs, suggesting features, and sending pull requests</em></a></li>
+				</ul>
+			</section>
+		</main>
+
+		<footer class="foot">
+			<p>
+				Written with agentic assistance from Claude. The code and security posture have been reviewed by the author and by
+				multiple AI-assisted audits, documented in <a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md">SECURITY.md</a>.
+			</p>
+			<p class="foot-links">
+				<a href="https://github.com/zorcerer/heddohon/blob/main/LICENSE">MIT license</a>
+				<a href="https://ko-fi.com/zorcerer">Ko-fi</a>
+				<a href="https://github.com/zorcerer/heddohon-site">Site source</a>
+			</p>
+		</footer>
+
+		<script src="site.js" defer></script>
+	</body>
+</html>

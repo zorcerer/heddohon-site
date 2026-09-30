@@ -1,0 +1,921 @@
+/*
+ * heddohon.app
+ *
+ * The same rules as the application (`src/lib/styles/app.css` in
+ * zorcerer/heddohon): a colourless ground, and every hue on the page taken from
+ * artwork. Here the artwork is the screenshots. `site.js` samples the one
+ * nearest the middle of the viewport and writes --art-h/s/l on the root, so
+ * the room changes colour as you scroll. Depth comes from surface elevation,
+ * hairline borders and blur; there is no glow and no fixed accent.
+ */
+
+@font-face {
+	font-family: 'Manrope Variable';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 200 800;
+	src: url('assets/fonts/manrope-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+	font-family: 'JetBrains Mono Variable';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 100 800;
+	src: url('assets/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+/* Registered so the room eases between colours rather than jumping. */
+@property --art-h {
+	syntax: '<number>';
+	inherits: true;
+	initial-value: 218;
+}
+
+@property --art-s {
+	syntax: '<percentage>';
+	inherits: true;
+	initial-value: 16%;
+}
+
+@property --art-l {
+	syntax: '<percentage>';
+	inherits: true;
+	initial-value: 54%;
+}
+
+:root {
+	--font-display: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--font-ui: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
+	--display-weight: 800;
+	--display-tracking: -0.035em;
+
+	/* Each step roughly 1.35x the last, as in the app. */
+	--r-xl: 1.375rem;
+	--r-lg: 1rem;
+	--r-md: 0.75rem;
+	--r-sm: 0.5625rem;
+	--r-pill: 999px;
+
+	--float-gap: 0.75rem;
+	--measure: 72rem;
+
+	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+	--ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+	--dur-press: 120ms;
+	--dur-hover: 220ms;
+	--dur-travel: 480ms;
+	--dur-colour: 900ms;
+	--ease-colour: cubic-bezier(0.4, 0, 0.2, 1);
+
+	--art-h: 218;
+	--art-s: 16%;
+	--art-l: 54%;
+	--art: hsl(var(--art-h) var(--art-s) var(--art-l));
+
+	transition:
+		--art-h var(--dur-colour) var(--ease-colour),
+		--art-s var(--dur-colour) var(--ease-colour),
+		--art-l var(--dur-colour) var(--ease-colour);
+}
+
+@supports (transition-timing-function: linear(0, 1)) {
+	:root {
+		--ease-spring: linear(
+			0, 0.008 1.2%, 0.045 3.1%, 0.119 5.4%, 0.226 8%, 0.356 10.8%, 0.496 13.8%,
+			0.633 17%, 0.757 20.4%, 0.86 23.9%, 0.938 27.5%, 0.993 31.3%, 1.026 35.2%,
+			1.042 39.2%, 1.046 43.4%, 1.042 47.6%, 1.033 51.9%, 1.024 56.3%, 1.015 60.9%,
+			1.008 65.5%, 1.003 70.2%, 1 75%, 0.998 84.7%, 1
+		);
+	}
+}
+
+/* ── Liquid ─────────────────────────────────────────────────────────────── */
+:root,
+[data-theme='dark'] {
+	--bg-base: #0b0c0f;
+	--bg-surface: #111317;
+	--bg-raised: #181a1f;
+
+	--text-strong: #f7f8fa;
+	--text-default: #e1e3e7;
+	--text-muted: #a2a6ae;
+	--text-faint: #767a84;
+
+	--border-hairline: #1f2227;
+	--border-strong: #30343c;
+
+	/* The app's worst-hue values: 4.5:1 as text and as a label on itself. */
+	--accent: hsl(var(--art-h) min(calc(var(--art-s) + 14%), 52%) 70%);
+	--accent-strong: hsl(var(--art-h) min(calc(var(--art-s) + 18%), 56%) 80%);
+	--accent-quiet: hsl(var(--art-h) min(calc(var(--art-s) + 6%), 44%) 30%);
+	--accent-contrast: #0b0c0e;
+
+	--glass-base: 58%;
+	--glass-tint: 14%;
+	--glass-blur: blur(30px) saturate(88%) brightness(0.42);
+	--control-face: color-mix(in srgb, var(--bg-raised) 46%, transparent);
+	--control-blur: blur(14px) saturate(90%) brightness(0.72);
+	--text-muted-through: #b4b8c0;
+
+	--text-shade: 0 1px 2px rgb(0 0 0 / 0.42);
+	--glass-edge: color-mix(in srgb, #ffffff 14%, transparent);
+	--glass-sheen: rgb(255 255 255 / 0.1);
+	--ambience-strength: 38%;
+	--float-shadow: 0 22px 48px -24px rgb(0 0 0 / 0.85), 0 2px 10px -4px rgb(0 0 0 / 0.6);
+
+	color-scheme: dark;
+}
+
+/* ── Paper ──────────────────────────────────────────────────────────────── */
+[data-theme='light'] {
+	--bg-base: #f0e7d5;
+	--bg-surface: #f6efe1;
+	--bg-raised: #faf5ea;
+
+	--text-strong: #2e241a;
+	--text-default: #453b30;
+	--text-muted: #594f43;
+	--text-faint: #6c6256;
+
+	--border-hairline: #d8cfbe;
+	--border-strong: #c0b6a6;
+
+	/* The artwork's hue at the lightness pale type needs, mixed with the rust
+	   ink: all rust for a grey cover, 30 percent for a saturated one. */
+	--rust-share: min(100%, calc(30% + max(0%, 45% - var(--art-s)) * 3));
+	--accent-l: calc(31% + 9% * max(0, cos((var(--art-h) - 255) * 1deg)));
+	--accent: color-mix(
+		in oklab,
+		hsl(var(--art-h) min(calc(var(--art-s) + 10%), 52%) var(--accent-l)) calc(100% - var(--rust-share)),
+		#7a2e12
+	);
+	--accent-strong: color-mix(
+		in oklab,
+		hsl(var(--art-h) min(calc(var(--art-s) + 14%), 56%) calc(var(--accent-l) - 5%)) calc(100% - var(--rust-share)),
+		#6a2610
+	);
+	--accent-quiet: color-mix(in oklab, hsl(var(--art-h) min(calc(var(--art-s) + 16%), 60%) 76%) 65%, #e8d4b0);
+	--accent-contrast: #fbf6ec;
+
+	--glass-base: 80%;
+	--glass-tint: 5%;
+	--glass-blur: blur(26px) sepia(0.25) saturate(90%);
+	--control-face: color-mix(in srgb, var(--bg-raised) 64%, transparent);
+	--control-blur: blur(14px) sepia(0.2);
+	--text-muted-through: #4f463b;
+
+	--text-shade: 0 1px 0 rgb(255 250 238 / 0.55);
+	--glass-edge: rgb(46 36 26 / 0.16);
+	--glass-sheen: rgb(255 250 238 / 0.6);
+	--ambience-strength: 16%;
+	--float-shadow: 0 18px 40px -22px rgb(74 52 30 / 0.34), 0 2px 8px -5px rgb(74 52 30 / 0.2);
+
+	--display-weight: 700;
+	--display-tracking: -0.028em;
+
+	color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	background: var(--bg-base);
+	scroll-behavior: smooth;
+	scroll-padding-top: 6rem;
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	font-family: var(--font-ui);
+	font-size: 1rem;
+	line-height: 1.6;
+	color: var(--text-default);
+	/* One pixel of shade separates a glyph from whatever the room carries. */
+	text-shadow: var(--text-shade);
+	-webkit-font-smoothing: antialiased;
+	overflow-x: clip;
+}
+
+a {
+	color: inherit;
+	text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+	text-underline-offset: 0.2em;
+	transition: color var(--dur-hover) var(--ease-out);
+}
+
+a:hover {
+	color: var(--accent);
+}
+
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+	border-radius: var(--r-sm);
+}
+
+code,
+pre {
+	font-family: var(--font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 0.875em;
+}
+
+img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+/* ── The room ───────────────────────────────────────────────────────────── */
+/*
+ * The only place the artwork's colour is painted. Four pools that fall off at
+ * different rates, so it reads as light with a direction to it. Everything
+ * translucent on the page shows this through its blur.
+ */
+.room {
+	position: fixed;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+	background:
+		url('assets/grain.png') 0 0 / 128px 128px repeat,
+		radial-gradient(90% 70% at 4% 96%, color-mix(in srgb, var(--art) var(--ambience-strength), transparent) 0%, transparent 70%),
+		radial-gradient(80% 60% at 98% 2%, color-mix(in srgb, var(--art) calc(var(--ambience-strength) * 0.8), transparent) 0%, transparent 68%),
+		radial-gradient(70% 90% at 78% 100%, color-mix(in srgb, var(--art) calc(var(--ambience-strength) * 0.5), transparent) 0%, transparent 66%),
+		linear-gradient(160deg, color-mix(in srgb, var(--art) calc(var(--ambience-strength) * 0.28), transparent) 0%, transparent 60%),
+		linear-gradient(var(--bg-base), var(--bg-base));
+}
+
+/* Paper: a ledger grid, the grain, a few stains, and weaker pools. */
+[data-theme='light'] .room {
+	background:
+		repeating-linear-gradient(to bottom, transparent 0 33px, rgb(46 36 26 / 0.05) 33px 34px),
+		repeating-linear-gradient(to right, transparent 0 33px, rgb(46 36 26 / 0.03) 33px 34px),
+		url('assets/grain.png') 0 0 / 128px 128px repeat,
+		radial-gradient(ellipse 90px 60px at 12% 18%, rgb(122 90 46 / 0.08), transparent 70%),
+		radial-gradient(ellipse 40px 52px at 88% 9%, rgb(109 79 40 / 0.065), transparent 72%),
+		radial-gradient(ellipse 130px 70px at 76% 61%, rgb(122 90 46 / 0.05), transparent 68%),
+		radial-gradient(ellipse 55px 38px at 27% 74%, rgb(107 74 34 / 0.06), transparent 70%),
+		radial-gradient(ellipse 70px 46px at 6% 52%, rgb(109 79 40 / 0.055), transparent 71%),
+		radial-gradient(90% 70% at 4% 96%, color-mix(in srgb, var(--art) var(--ambience-strength), transparent) 0%, transparent 70%),
+		radial-gradient(80% 60% at 98% 2%, color-mix(in srgb, var(--art) calc(var(--ambience-strength) * 0.8), transparent) 0%, transparent 68%),
+		linear-gradient(var(--bg-base), var(--bg-base));
+}
+
+/* ── Material ───────────────────────────────────────────────────────────── */
+.glass {
+	--text-muted: var(--text-muted-through);
+	background-color: color-mix(in srgb, var(--bg-surface) var(--glass-base), transparent);
+	background-image: linear-gradient(
+		to bottom,
+		color-mix(in srgb, var(--art) var(--glass-tint), transparent),
+		transparent
+	);
+	-webkit-backdrop-filter: var(--glass-blur);
+	backdrop-filter: var(--glass-blur);
+}
+
+/* Glass catches light on the edge nearest the viewer. */
+.float {
+	border-radius: var(--r-xl);
+	border: 1px solid var(--glass-edge);
+	box-shadow:
+		inset 0 1px 0 var(--glass-sheen),
+		var(--float-shadow);
+}
+
+.key {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-height: 2.75rem;
+	padding: 0 1.1rem;
+	border-radius: var(--r-md);
+	border: 1px solid var(--glass-edge);
+	background: var(--control-face);
+	-webkit-backdrop-filter: var(--control-blur);
+	backdrop-filter: var(--control-blur);
+	box-shadow: inset 0 1px 0 var(--glass-sheen);
+	color: var(--text-strong);
+	font: 600 0.9375rem/1 var(--font-ui);
+	text-decoration: none;
+	cursor: pointer;
+	transition:
+		color var(--dur-hover) var(--ease-out),
+		border-color var(--dur-hover) var(--ease-out),
+		transform var(--dur-press) var(--ease-out);
+}
+
+.key svg {
+	width: 1rem;
+	height: 1rem;
+}
+
+.key:hover {
+	color: var(--accent);
+	border-color: color-mix(in srgb, var(--accent) 40%, var(--glass-edge));
+}
+
+.key:active {
+	transform: scale(0.97);
+}
+
+.key--primary {
+	background: var(--accent);
+	border-color: transparent;
+	color: var(--accent-contrast);
+	text-shadow: none;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+}
+
+.key--primary:hover {
+	background: var(--accent-strong);
+	color: var(--accent-contrast);
+}
+
+.key--small {
+	min-height: 2rem;
+	padding: 0 0.75rem;
+	font-size: 0.8125rem;
+}
+
+/* Paper: flat keys pressed into the sheet, with a ring of the pale accent. */
+[data-theme='light'] .key {
+	border-color: var(--border-strong);
+	box-shadow:
+		inset 0 1px 0 rgb(255 250 238 / 0.7),
+		0 1px 0 rgb(46 36 26 / 0.08);
+}
+
+[data-theme='light'] .key:hover,
+[data-theme='light'] .key:focus-visible {
+	border-color: color-mix(in srgb, var(--accent) 55%, var(--border-strong));
+	box-shadow:
+		inset 0 1px 0 rgb(255 250 238 / 0.7),
+		0 0 0 3px color-mix(in srgb, var(--accent-quiet) 70%, transparent);
+}
+
+[data-theme='light'] .key--primary {
+	border-color: var(--accent-strong);
+}
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.15rem 0.6rem;
+	border-radius: var(--r-pill);
+	border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
+	color: var(--accent);
+	font: 500 0.75rem/1.5 var(--font-mono);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+/* Hi-res is the filled badge in the stronger accent, apart by weight not hue. */
+.chip--hires {
+	background: var(--accent-strong);
+	border-color: var(--accent-strong);
+	color: var(--accent-contrast);
+	font-weight: 700;
+	text-shadow: none;
+}
+
+/* ── The bar ────────────────────────────────────────────────────────────── */
+/* Floats clear of the window edge with the app's gutter, as the rail does. */
+.bar {
+	position: sticky;
+	top: calc(var(--float-gap) + env(safe-area-inset-top, 0px));
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	max-width: var(--measure);
+	margin: calc(var(--float-gap) + env(safe-area-inset-top, 0px)) auto 0;
+	width: calc(100% - 2 * var(--float-gap));
+	padding: 0.5rem 0.5rem 0.5rem 0.9rem;
+}
+
+.brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
+	margin-right: auto;
+	color: var(--text-strong);
+	font-weight: 800;
+	letter-spacing: -0.02em;
+	text-decoration: none;
+}
+
+.crest {
+	width: 1.75rem;
+	height: 1.75rem;
+}
+
+.bar nav {
+	display: flex;
+	gap: 0.25rem;
+	margin-right: 0.5rem;
+}
+
+.bar nav a {
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--r-sm);
+	color: var(--text-muted);
+	font-size: 0.9375rem;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.bar nav a:hover {
+	color: var(--accent);
+}
+
+.bar .key {
+	min-height: 2.5rem;
+	padding: 0 0.8rem;
+}
+
+.theme-name {
+	display: none;
+}
+
+[data-theme='dark'] .theme-name[data-for='dark'],
+[data-theme='light'] .theme-name[data-for='light'] {
+	display: inline;
+}
+
+@media (max-width: 44rem) {
+	.bar nav {
+		display: none;
+	}
+}
+
+/* ── Page ───────────────────────────────────────────────────────────────── */
+main,
+.foot {
+	max-width: var(--measure);
+	margin: 0 auto;
+	padding: 0 max(1rem, env(safe-area-inset-left, 0px));
+}
+
+h1,
+h2,
+h3 {
+	font-family: var(--font-display);
+	color: var(--text-strong);
+	margin: 0;
+}
+
+.hero {
+	display: grid;
+	grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+	align-items: center;
+	gap: 3rem;
+	padding: 5.5rem 0 3rem;
+}
+
+.eyebrow {
+	margin: 0 0 0.75rem;
+	color: var(--text-muted);
+	font: 500 0.8125rem/1 var(--font-mono);
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+}
+
+h1 {
+	font-size: clamp(3.25rem, 6.2vw, 5.25rem);
+	line-height: 0.95;
+	font-weight: var(--display-weight);
+	letter-spacing: var(--display-tracking);
+}
+
+.lede {
+	margin: 1.25rem 0 1.5rem;
+	font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+	line-height: 1.35;
+	font-weight: 600;
+	color: var(--text-strong);
+}
+
+.lede span {
+	color: var(--text-muted);
+	font-weight: 500;
+}
+
+.chips,
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin: 0 0 1rem;
+}
+
+.actions {
+	margin-top: 1.75rem;
+}
+
+/*
+ * The sleeve, after the album page: it turns toward the pointer, up to 9
+ * degrees on each axis, lifts toward the viewer, and carries a highlight that
+ * follows the pointer across its face. A wrapper turns so the figure keeps its
+ * place in the layout. Mouse only, and not under reduced motion (`site.js`).
+ */
+.sleeve {
+	margin: 0;
+	perspective: 1600px;
+}
+
+.sleeve-turn {
+	position: relative;
+	border-radius: var(--r-xl);
+	overflow: hidden;
+	border: 1px solid var(--glass-edge);
+	box-shadow: var(--float-shadow);
+	transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(var(--lift, 0));
+	transition: transform var(--dur-travel) var(--ease-spring);
+}
+
+.sleeve.tracking .sleeve-turn {
+	transition: transform 80ms linear;
+}
+
+.sheen {
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(
+		40% 40% at var(--px, 50%) var(--py, 50%),
+		rgb(255 255 255 / 0.12),
+		transparent 70%
+	);
+	opacity: 0;
+	transition: opacity var(--dur-hover) var(--ease-out);
+	pointer-events: none;
+}
+
+.sleeve.tracking .sheen {
+	opacity: 1;
+}
+
+@media (max-width: 56rem) {
+	.hero {
+		grid-template-columns: 1fr;
+		padding-top: 3.5rem;
+		gap: 2.25rem;
+	}
+}
+
+.route {
+	display: grid;
+	gap: 0.75rem;
+	justify-items: center;
+	text-align: center;
+	padding: 1.5rem 0 1rem;
+}
+
+.route pre {
+	margin: 0;
+	color: var(--text-muted);
+	font-size: clamp(0.75rem, 2.4vw, 1rem);
+	white-space: pre;
+}
+
+.route pre b {
+	color: var(--accent);
+	font-weight: 700;
+}
+
+.route p {
+	max-width: 38rem;
+	margin: 0;
+	color: var(--text-muted);
+}
+
+/* ── Catalogue sections ─────────────────────────────────────────────────── */
+/* Numbered and ruled: a mono index in the margin and a hairline to the edge. */
+.section {
+	padding: 4.5rem 0 1rem;
+}
+
+.section-head {
+	display: flex;
+	align-items: baseline;
+	gap: 1rem;
+	margin-bottom: 2rem;
+	font-size: clamp(1.75rem, 4vw, 2.5rem);
+	font-weight: var(--display-weight);
+	letter-spacing: var(--display-tracking);
+	line-height: 1.1;
+}
+
+.index {
+	color: var(--text-faint);
+	font: 500 0.8125rem/1 var(--font-mono);
+	letter-spacing: 0.08em;
+	font-variant-numeric: tabular-nums;
+}
+
+.section-head .index {
+	width: 2rem;
+	flex: none;
+}
+
+.rule {
+	flex: 1;
+	height: 1px;
+	align-self: center;
+	background: var(--border-strong);
+}
+
+/* A printed index: numbers hang in the margin, hairlines separate entries. */
+.index-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	counter-reset: entry;
+}
+
+.index-list li {
+	counter-increment: entry;
+	display: grid;
+	grid-template-columns: 3rem minmax(0, 1fr) auto;
+	gap: 0 1rem;
+	align-items: baseline;
+	padding: 1.1rem 0;
+	border-top: 1px solid var(--border-hairline);
+	transition: background-color var(--dur-hover) var(--ease-out);
+}
+
+.index-list li:last-child {
+	border-bottom: 1px solid var(--border-hairline);
+}
+
+.index-list li::before {
+	content: counter(entry, decimal-leading-zero);
+	color: var(--text-faint);
+	font: 500 0.8125rem/1.6 var(--font-mono);
+	text-align: right;
+	padding-right: 0.5rem;
+}
+
+/* Hover tints the row rather than filling it. */
+.index-list li:hover {
+	background: linear-gradient(to right, transparent, color-mix(in srgb, var(--art) 8%, transparent) 20%, transparent);
+}
+
+.index-list li:hover h3 {
+	color: var(--accent);
+}
+
+.index-list h3 {
+	font-size: 1.125rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	transition: color var(--dur-hover) var(--ease-out);
+}
+
+.index-list p {
+	margin: 0.25rem 0 0;
+	max-width: 44rem;
+	color: var(--text-muted);
+}
+
+@media (max-width: 40rem) {
+	.index-list li {
+		grid-template-columns: 2.25rem minmax(0, 1fr);
+	}
+
+	.index-list .chip {
+		grid-column: 2;
+		justify-self: start;
+		margin-top: 0.6rem;
+	}
+}
+
+.shots {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1.5rem;
+}
+
+.shot {
+	margin: 0;
+}
+
+.shot img {
+	border-radius: var(--r-lg);
+	border: 1px solid var(--glass-edge);
+	box-shadow: var(--float-shadow);
+}
+
+.shot--wide {
+	grid-column: 1 / -1;
+}
+
+.shot figcaption {
+	display: flex;
+	gap: 0.75rem;
+	align-items: baseline;
+	margin-top: 0.75rem;
+	color: var(--text-muted);
+	font-size: 0.9375rem;
+}
+
+@media (max-width: 44rem) {
+	.shots {
+		grid-template-columns: 1fr;
+	}
+}
+
+.install {
+	display: grid;
+	grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+	gap: 2rem;
+	align-items: start;
+}
+
+@media (max-width: 60rem) {
+	.install {
+		grid-template-columns: 1fr;
+	}
+}
+
+.terminal {
+	overflow: hidden;
+}
+
+.terminal-top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.6rem 0.6rem 0.6rem 1.1rem;
+	border-bottom: 1px solid var(--glass-edge);
+}
+
+.label {
+	color: var(--text-muted);
+	font: 500 0.75rem/1 var(--font-mono);
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.terminal pre {
+	margin: 0;
+	padding: 1.1rem 1.25rem 1.3rem;
+	overflow-x: auto;
+	line-height: 1.8;
+	color: var(--text-strong);
+}
+
+.facts {
+	margin: 0;
+}
+
+.facts div {
+	display: grid;
+	grid-template-columns: 6.5rem minmax(0, 1fr);
+	gap: 1rem;
+	padding: 0.8rem 0;
+	border-top: 1px solid var(--border-hairline);
+}
+
+.facts div:first-child {
+	border-top: 0;
+	padding-top: 0.2rem;
+}
+
+.facts dt {
+	color: var(--text-faint);
+	font: 500 0.75rem/1.9 var(--font-mono);
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.facts dd {
+	margin: 0;
+	color: var(--text-muted);
+	font-size: 0.9375rem;
+}
+
+.facts code {
+	color: var(--text-default);
+	overflow-wrap: anywhere;
+}
+
+/* The way a book's index is set: dotted leaders to the description. */
+.docs {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.docs a {
+	display: flex;
+	align-items: baseline;
+	gap: 0.75rem;
+	padding: 0.8rem 0;
+	color: var(--text-strong);
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.docs a:hover {
+	color: var(--accent);
+}
+
+.docs em {
+	font-style: normal;
+	font-weight: 400;
+	color: var(--text-muted);
+	text-align: right;
+}
+
+.leader {
+	flex: 1;
+	min-width: 2rem;
+	border-bottom: 1px dotted var(--border-strong);
+	transform: translateY(-0.3em);
+}
+
+@media (max-width: 40rem) {
+	.docs a {
+		flex-wrap: wrap;
+	}
+
+	.leader {
+		display: none;
+	}
+
+	.docs em {
+		flex-basis: 100%;
+		text-align: left;
+	}
+}
+
+.foot {
+	margin-top: 5rem;
+	padding-top: 2rem;
+	padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+	border-top: 1px solid var(--border-hairline);
+	color: var(--text-faint);
+	font-size: 0.875rem;
+}
+
+.foot p {
+	max-width: 44rem;
+	margin: 0 0 1rem;
+}
+
+.foot-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.5rem;
+}
+
+/* ── Degradation ────────────────────────────────────────────────────────── */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+	.glass {
+		background-color: var(--bg-surface);
+	}
+}
+
+@media (prefers-reduced-transparency: reduce) {
+	.glass,
+	.key {
+		background-color: var(--bg-surface);
+		background-image: none;
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+	}
+
+	.key--primary {
+		background-color: var(--accent);
+	}
+
+	.room {
+		display: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		transition: none;
+	}
+
+	html {
+		scroll-behavior: auto;
+	}
+
+	.sleeve-turn,
+	.key {
+		transition: none;
+	}
+}
