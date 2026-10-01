@@ -164,11 +164,22 @@ function warm(theme) {
 applyTheme(root.dataset.theme);
 
 /*
- * The new theme's ground spreads from the switch over the travel length, the
- * theme changes under it, and it fades over the state length. The first
- * animation holds its last frame until the second has started, so the old
- * theme is not shown for a frame between them.
+ * The page in the new theme is uncovered from the switch outward, behind a
+ * soft edge, over the length of a colour change (`.turning` in the
+ * stylesheet). It is a view transition: the browser holds a picture of the
+ * page as it was and shows the new one through a circle that grows to the
+ * farthest corner of the window.
+ *
+ * It was a sheet of the new theme's ground, spread from the switch over the
+ * travel length on the out curve and then faded. That curve covers half its
+ * distance in the first 72ms, and the sheet had 1.5 times the window to
+ * cross, so the window was covered within about six frames: a cut to a flat
+ * colour, as it was reported.
+ *
+ * Where the browser has no view transitions, the ground fades in over the
+ * page, the theme changes under it, and it fades out.
  */
+const EDGE = 160;
 const veil = document.querySelector('.veil');
 let turning = false;
 document.querySelector('.theme')?.addEventListener('click', (event) => {
@@ -178,26 +189,41 @@ document.querySelector('.theme')?.addEventListener('click', (event) => {
 		localStorage.setItem('hh-theme', next);
 	} catch {}
 	warm(next);
-	if (!veil?.animate || reducedMotion.matches) return applyTheme(next);
+	if (reducedMotion.matches) return applyTheme(next);
 
-	const box = event.currentTarget.getBoundingClientRect();
-	const at = `${box.left + box.width / 2}px ${box.top + box.height / 2}px`;
 	turning = true;
-	veil.style.background = GROUND[next];
-	const spread = veil.animate(
-		[
-			{ opacity: 1, clipPath: `circle(0 at ${at})` },
-			{ opacity: 1, clipPath: `circle(150vmax at ${at})` }
-		],
-		{ duration: DUR.travel, easing: EASE_OUT, fill: 'forwards' }
-	);
-	const settle = () => {
-		applyTheme(next);
-		veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: DUR.state, easing: EASE_OUT });
-		spread.cancel();
+	const done = () => {
+		root.classList.remove('turning');
 		turning = false;
 	};
-	spread.finished.then(settle, settle);
+
+	if (document.startViewTransition) {
+		const box = event.currentTarget.getBoundingClientRect();
+		const x = box.left + box.width / 2;
+		const y = box.top + box.height / 2;
+		const reach = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+		root.style.setProperty('--turn-x', `${x}px`);
+		root.style.setProperty('--turn-y', `${y}px`);
+		root.style.setProperty('--turn-edge', `${EDGE}px`);
+		root.style.setProperty('--turn-reach', `${Math.ceil(reach + EDGE)}px`);
+		root.classList.add('turning');
+		document.startViewTransition(() => applyTheme(next)).finished.then(done, done);
+		return;
+	}
+
+	if (!veil?.animate) {
+		applyTheme(next);
+		return done();
+	}
+	veil.style.background = GROUND[next];
+	const cover = veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: DUR.hover, easing: EASE_OUT, fill: 'forwards' });
+	const uncover = () => {
+		applyTheme(next);
+		// Started before the first is cancelled, so no frame falls between them.
+		veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: DUR.state, easing: EASE_OUT }).finished.then(done, done);
+		cover.cancel();
+	};
+	cover.finished.then(uncover, uncover);
 });
 
 /* ── The sleeve ────────────────────────────────────────────────────────── */

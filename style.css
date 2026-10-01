@@ -433,8 +433,55 @@ h3 {
 	}
 }
 
-/* The change of theme: the new ground spreads from the switch, the theme
-   changes under it, and it fades. `site.js` runs it; at rest it is not shown. */
+/*
+ * The change of theme. The page in the new theme is shown through a circle
+ * that grows from the switch to the farthest corner of the window, with an
+ * edge --turn-edge wide that fades from one theme to the other. It takes the
+ * length and the curve of a colour change, which is what it is: on the travel
+ * length and the out curve the circle crossed the window in about six frames.
+ *
+ * `site.js` starts it as a view transition and sets `turning`, the centre
+ * (--turn-x, --turn-y) and the radius to end on (--turn-reach). The picture
+ * of the old page stays still underneath, and --reveal is the radius.
+ */
+@property --reveal {
+	syntax: '<length>';
+	inherits: false;
+	initial-value: 0px;
+}
+
+.turning::view-transition-old(root),
+.turning::view-transition-new(root) {
+	animation: none;
+	mix-blend-mode: normal;
+}
+
+.turning::view-transition-new(root) {
+	-webkit-mask-image: radial-gradient(
+		circle at var(--turn-x) var(--turn-y),
+		#000 calc(var(--reveal) - var(--turn-edge)),
+		transparent var(--reveal)
+	);
+	mask-image: radial-gradient(
+		circle at var(--turn-x) var(--turn-y),
+		#000 calc(var(--reveal) - var(--turn-edge)),
+		transparent var(--reveal)
+	);
+	animation: reveal var(--dur-colour) var(--ease-colour) both;
+}
+
+@keyframes reveal {
+	from {
+		--reveal: 0px;
+	}
+	to {
+		--reveal: var(--turn-reach);
+	}
+}
+
+/* Where the browser has no view transitions: the new ground fades in over
+   the page, the theme changes under it, and it fades out. At rest it is not
+   shown. */
 .veil {
 	position: fixed;
 	inset: 0;
