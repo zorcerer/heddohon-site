@@ -37,8 +37,10 @@ HEDDOHON_IMAGE=ghcr.io/zorcerer/heddohon:dev screenshots/run.sh
 
 It downloads a library into the Docker volume `hh-shots-library` (3.8 GB, kept
 for the next run), starts a Navidrome and a Heddohon on a network of their own,
-scans the library, and captures four desktop pages at 1440x960 and two phone
-pages at 393x852 with Playwright. The servers, their data and the network are
+scans the library, and captures five desktop pages at 1440x960 and two phone
+pages at 393x852 with Playwright. The plays behind `listening.jpg` are mock:
+`capture.mjs` writes about 2,700 of them, spread over 150 days, into
+Heddohon's database. The servers, their data and the network are
 removed at the end. Each shot names its album and track in `capture.mjs`;
 change them there. On a failure, `assets/shots/failed.png` shows the page as
 it was.

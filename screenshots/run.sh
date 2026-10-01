@@ -50,7 +50,9 @@ docker run -d --name $P-heddohon --network $P \
 
 echo "== capture ($HEDDOHON_IMAGE)"
 status=0
+# The data volume is for the plays capture.mjs writes into Heddohon's database.
 docker run -i --name $P-capture --network $P --ipc=host \
+	-v $P-data:/data \
 	-e ND_URL=http://$P-navidrome:4533 -e APP_URL=http://$P-heddohon:3000 \
 	-e PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 -e npm_config_update_notifier=false \
 	"$PLAYWRIGHT_IMAGE" sh -c '

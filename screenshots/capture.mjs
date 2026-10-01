@@ -7,6 +7,7 @@
 import { chromium } from 'playwright';
 import { createHash, randomBytes } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
+import { DatabaseSync } from 'node:sqlite';
 
 const ND = process.env.ND_URL;
 const APP = process.env.APP_URL;
@@ -75,6 +76,7 @@ const stars = await album(/^Addressed to the Stars$/);
 const wings = await album(/^Dirty Wings$/);
 const whispering = await album(/^Only Whispering$/);
 const machine = await album(/^The Beautiful Machine$/);
+const wake = await album(/^The Wake$/);
 
 // ── Heddohon ───────────────────────────────────────────────────────────────
 await until('Heddohon', async () => (await fetch(`${APP}/healthz`)).ok);
@@ -101,6 +103,89 @@ const phone = await signedIn({
 	isMobile: true,
 	hasTouch: true
 });
+
+/**
+ * Writes five months of plays for the account, for the Your listening shot.
+ *
+ * Heddohon records a play as it ends and takes no date for one, so the rows go
+ * into its SQLite file, which run.sh mounts at /data. The figures are mock:
+ * sessions of 3 to 9 tracks of one album, more of them in the evening and at
+ * the weekend, `favourite` most often, from a generator with a fixed seed.
+ * The hours are UTC, which is this browser's time zone.
+ */
+async function seedPlays(favourite) {
+	let state = 20261001;
+	// mulberry32
+	const random = () => {
+		state = (state + 0x6d2b79f5) | 0;
+		let t = Math.imul(state ^ (state >>> 15), 1 | state);
+		t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+	};
+	const pick = (weights) => {
+		let at = random() * weights.reduce((sum, weight) => sum + weight, 0);
+		return weights.findIndex((weight) => (at -= weight) < 0);
+	};
+
+	// The favourite first, then the rest in the order of the listing.
+	const albums = [favourite];
+	for (const { id } of albumList2.album) {
+		if (id !== favourite.id) albums.push((await subsonic('getAlbum', { id })).album);
+	}
+	const albumWeights = albums.map((_, rank) => 1 / (rank + 1) ** 0.7);
+	// Sessions by the hour they start in, from midnight, and a day, from Sunday.
+	const hourWeights = [1, 0, 0, 0, 0, 0, 1, 3, 6, 5, 3, 2, 3, 5, 3, 2, 3, 5, 7, 9, 10, 8, 5, 2];
+	const sessionsOn = [4, 3, 3, 3, 3, 4, 5];
+
+	const HOUR = 60 * 60 * 1000;
+	const DAY = 24 * HOUR;
+	const now = Date.now();
+	const midnight = now - (now % DAY);
+	const plays = [];
+	for (let day = 150; day >= 0; day--) {
+		const start = midnight - day * DAY;
+		// About one day in twenty has none.
+		if (random() < 0.05) continue;
+		const sessions = Math.max(1, sessionsOn[new Date(start).getUTCDay()] + pick([1, 2, 1]) - 1);
+		for (let session = 0; session < sessions; session++) {
+			const { song } = albums[pick(albumWeights)];
+			let at = start + (pick(hourWeights) + random()) * HOUR;
+			// From the first track two times in three, from anywhere otherwise.
+			let index = random() < 0.66 ? 0 : Math.floor(random() * song.length);
+			for (let count = 3 + Math.floor(random() * 7); count > 0 && index < song.length; count--, index++) {
+				at += song[index].duration * 1000;
+				if (at < now) plays.push([song[index], Math.round(at)]);
+			}
+		}
+	}
+
+	const database = new DatabaseSync('/data/heddohon.db');
+	database.exec('PRAGMA busy_timeout = 5000');
+	const { id: account } = database.prepare('SELECT id FROM accounts').get();
+	const insert = database.prepare(
+		`INSERT INTO plays (account_id, song_id, played_at, title, artist, artist_id, album, album_id, cover_art, duration)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	);
+	database.exec('BEGIN');
+	for (const [song, at] of plays) {
+		insert.run(
+			account,
+			song.id,
+			at,
+			song.title,
+			song.artist ?? null,
+			song.artistId ?? null,
+			song.album ?? null,
+			song.albumId ?? null,
+			song.coverArt ?? null,
+			song.duration
+		);
+	}
+	database.exec('COMMIT');
+	database.close();
+	console.log(`seeded ${plays.length} plays`);
+}
+await seedPlays(wake);
 
 let current;
 
@@ -161,6 +246,18 @@ try {
 	await page.locator('main section', { hasText: /More from/i }).last().evaluate((s) => s.scrollIntoView({ block: 'end' }));
 	await page.mouse.move(80, 940);
 	await shoot(page, 'recommendations');
+
+	// Your listening, over the plays seeded above. Reached by its links, since
+	// loading the address would stop what is playing. The rail holds the link
+	// in 0.4, and Recently played holds it as a tab after.
+	await play(page, wake, 0, 30);
+	const listening = page.locator('a[href="/stats"]').first();
+	if (!(await listening.count())) await page.locator('a[href="/history"]').first().click();
+	await listening.click();
+	// The two charts are drawn in the browser, in its time zone.
+	await page.locator('.when').waitFor();
+	await page.mouse.move(80, 940);
+	await shoot(page, 'listening');
 
 	await play(page, whispering, 0, 0);
 	await page.getByRole('button', { name: 'Share a link to this song' }).click();
