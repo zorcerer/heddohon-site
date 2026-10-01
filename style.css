@@ -790,6 +790,10 @@ h1 {
 	overflow-wrap: anywhere;
 }
 
+.facts .key {
+	margin-top: 0.6rem;
+}
+
 /* The way a book's index is set: dotted leaders to the description. */
 .docs {
 	list-style: none;
