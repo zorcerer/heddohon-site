@@ -7,7 +7,7 @@ Static HTML, CSS and one script, served by GitHub Pages from the root of
 `main`. There is no build step. To preview it, serve the directory with any
 static file server, for example `docker run --rm -p 8080:80 -v "$PWD":/usr/share/nginx/html:ro nginx:alpine`.
 
-It follows the application's [design notes](https://github.com/zorcerer/heddohon/blob/main/docs/design.md):
+It follows the application's [design notes](https://github.com/zorcerer/heddohon/wiki/Design-notes):
 a colourless ground, and every hue taken from artwork. `site.js` samples the
 screenshot nearest the middle of the viewport and writes `--art-h/s/l` on the
 root, so the page changes colour as it scrolls. The top bar switches between

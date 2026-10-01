@@ -156,8 +156,16 @@
 						<span class="chip">LRCLIB</span>
 					</li>
 					<li>
-						<div><h3>One app across your devices</h3><p>Installs on phones and desktops. The queue and settings follow you, and one browser can pause, skip or take over the queue of another.</p></div>
-						<span class="chip">PWA</span>
+						<div><h3>One app across your devices</h3><p>A desktop app for Linux and Windows and an experimental one for Android, on each release, and it installs from the browser on a Mac, an iPhone and an iPad. The queue and settings follow you, and one browser can pause, skip or take over the queue of another.</p></div>
+						<span class="chip">apps</span>
+					</li>
+					<li>
+						<div><h3>An equaliser that knows your headphones</h3><p>Ten bands, kept per browser, with a correction for one of about 8,850 headphones measured by AutoEq, or from a ParametricEQ.txt of your own. Crossfades leave the joins of an album alone.</p></div>
+						<span class="chip">AutoEq</span>
+					</li>
+					<li>
+						<div><h3>Internet radio</h3><p>The stations Navidrome lists, played through your server, from a stream address or an .m3u or .pls playlist.</p></div>
+						<span class="chip">radio</span>
 					</li>
 					<li>
 						<div><h3>Your listening, on your server</h3><p>Every play kept in Heddohon's own database: top artists, albums and hours, and the albums you played on this date in earlier years. Instant mixes of up to 100 similar tracks.</p></div>
@@ -240,6 +248,7 @@ docker compose up -d</code></pre>
 						<div><dt>Platforms</dt><dd><code>linux/amd64</code> and <code>linux/arm64</code>: a Raspberry Pi 4 or 5 on a 64-bit OS, an ARM NAS, an Ampere server. 32-bit ARM is not built.</dd></div>
 						<div><dt>Tags</dt><dd><code>latest</code> is the newest release. <code>dev</code> is built from the <code>dev</code> branch once a day when it has changed and passed the test suites.</dd></div>
 						<div><dt>Unraid</dt><dd>Listed in Community Applications, from the template in <a href="https://github.com/zorcerer/heddohon/blob/main/templates/heddohon.xml"><code>templates/heddohon.xml</code></a>.<br /><a class="key key--small" href="https://ca.unraid.net/apps/heddohon-0bp7lm80vkr69w">Install on Unraid</a></dd></div>
+						<div><dt>Apps</dt><dd>For Linux an AppImage, for Windows an installer and a portable <code>.exe</code> (not signed), and for Android an experimental APK. Each opens the server you run, and all are files on the <a href="https://github.com/zorcerer/heddohon/releases/latest">latest release</a>. <a href="https://github.com/zorcerer/heddohon/wiki/Apps">More about them</a>.</dd></div>
 						<div><dt>No Docker</dt><dd>On Node 22 or later: <code>npm ci && npm run build && node build/index.js</code></dd></div>
 					</dl>
 				</div>
@@ -248,11 +257,12 @@ docker compose up -d</code></pre>
 			<section id="docs" class="section">
 				<h2 class="section-head"><span class="index">05</span>Documentation<span class="rule"></span></h2>
 				<ul class="docs">
-					<li><a href="https://github.com/zorcerer/heddohon/blob/main/docs/configuration.md"><span>Configuration</span><span class="leader"></span><em>Environment variables, reverse proxies, PostgreSQL, Unraid</em></a></li>
+					<li><a href="https://github.com/zorcerer/heddohon/wiki/Configuration"><span>Configuration</span><span class="leader"></span><em>Environment variables, reverse proxies, PostgreSQL, Unraid</em></a></li>
+					<li><a href="https://github.com/zorcerer/heddohon/wiki/Apps"><span>Apps</span><span class="leader"></span><em>The desktop app for Linux and Windows, the Android app, and a sign-in in front of them</em></a></li>
 					<li><a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md"><span>Security</span><span class="leader"></span><em>Threat model, known gaps, reporting a vulnerability</em></a></li>
-					<li><a href="https://github.com/zorcerer/heddohon/blob/main/docs/audio.md"><span>Audio</span><span class="leader"></span><em>Formats, transcoding, and what high resolution means in a browser</em></a></li>
-					<li><a href="https://github.com/zorcerer/heddohon/blob/main/docs/architecture.md"><span>Architecture</span><span class="leader"></span><em>How the server, the client and the music server fit together</em></a></li>
-					<li><a href="https://github.com/zorcerer/heddohon/blob/main/docs/design.md"><span>Design notes</span><span class="leader"></span><em>Why the interface looks and behaves as it does</em></a></li>
+					<li><a href="https://github.com/zorcerer/heddohon/wiki/Audio"><span>Audio</span><span class="leader"></span><em>Formats, transcoding, and what high resolution means in a browser</em></a></li>
+					<li><a href="https://github.com/zorcerer/heddohon/wiki/Architecture"><span>Architecture</span><span class="leader"></span><em>How the server, the client and the music server fit together</em></a></li>
+					<li><a href="https://github.com/zorcerer/heddohon/wiki/Design-notes"><span>Design notes</span><span class="leader"></span><em>Why the interface looks and behaves as it does</em></a></li>
 					<li><a href="https://github.com/zorcerer/heddohon/blob/main/CONTRIBUTING.md"><span>Contributing</span><span class="leader"></span><em>Reporting bugs, suggesting features, and sending pull requests</em></a></li>
 				</ul>
 			</section>
