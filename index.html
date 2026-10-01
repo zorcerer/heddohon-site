@@ -44,7 +44,7 @@
 				<span>Heddohon</span>
 			</a>
 			<nav aria-label="Sections">
-				<a href="#features">Features</a>
+				<a href="#features">Why</a>
 				<a href="#screens">Screens</a>
 				<a href="#install">Install</a>
 				<a href="#docs">Docs</a>
@@ -64,6 +64,7 @@
 					<p class="eyebrow">ヘッドホン · headphones</p>
 					<h1>Heddohon</h1>
 					<p class="lede">A web music player you host yourself,<br /><span>for Navidrome, Subsonic and Jellyfin.</span></p>
+					<p class="pitch">Listen together over a live link, share a song with anyone, and keep your music server off the internet.</p>
 					<p class="chips">
 						<span class="chip chip--hires">FLAC 24/192</span>
 						<span class="chip">amd64 · arm64</span>
@@ -84,87 +85,139 @@
 							src="assets/shots/album.jpg"
 							width="1800"
 							height="1200"
-							alt="Heddohon showing an album page, with the track list in the middle and the now-playing panel on the right, both tinted by the cover"
+							alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right, both tinted gold by the cover"
 						/>
 						<span class="sheen" aria-hidden="true"></span>
 					</div>
 				</figure>
 			</section>
 
-			<section class="route" aria-label="How requests travel">
-				<pre><span>browser</span> ──► <b>Heddohon</b> ──► <span>Navidrome / Jellyfin</span></pre>
-				<p>
-					Heddohon signs in to your music server from its own backend and proxies the audio and the artwork. The
-					browser only talks to Heddohon, and your upstream credentials stay on the server.
-				</p>
+			<section id="features" class="section">
+				<h2 class="section-head"><span class="index">01</span>What it does differently<span class="rule"></span></h2>
+				<div class="pillars">
+					<article class="pillar">
+						<p class="pillar-label"><span class="index">a</span>Listen together</p>
+						<h3>Play for people who are not in the room</h3>
+						<p>
+							Start a session and send its link. Everyone who opens it hears what you play, as you play it, in their
+							own browser and without an account, and can answer with reactions.
+						</p>
+						<dl class="pillar-facts">
+							<div><dt>Listeners</dt><dd>up to 50</dd></div>
+							<div><dt>Reactions</dt><dd>5 emoji, 1 a second</dd></div>
+							<div><dt>Ends</dt><dd>when you end it, or after 12 h</dd></div>
+						</dl>
+					</article>
+					<article class="pillar">
+						<p class="pillar-label"><span class="index">b</span>Shared links</p>
+						<h3>A song, an album or a playlist, for anyone with the link</h3>
+						<p>
+							The link plays that one item in the browser, with its cover and the original file, and nothing else in
+							your library. Withdraw it from Settings and streams already playing through it stop.
+						</p>
+						<dl class="pillar-facts">
+							<div><dt>Lasts</dt><dd>1, 7 or 30 days</dd></div>
+							<div><dt>Token</dt><dd>256 random bits</dd></div>
+							<div><dt>Stored as</dt><dd>an HMAC digest</dd></div>
+						</dl>
+					</article>
+					<article class="pillar">
+						<p class="pillar-label"><span class="index">c</span>Security</p>
+						<h3>Your music server stays off the internet</h3>
+						<pre class="route"><span>browser</span> ─► <b>Heddohon</b> ─► <span>music server</span></pre>
+						<p>
+							The browser only talks to Heddohon, which fetches every byte from the music server itself. The upstream
+							address appears in no page, script or error. The threat model, the known gaps and each audit are in
+							<a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md">SECURITY.md</a>.
+						</p>
+						<dl class="pillar-facts">
+							<div><dt>Credentials</dt><dd>AES-256-GCM, scrypt keys</dd></div>
+							<div><dt>Sign-in</dt><dd>10 attempts a user in 15 min</dd></div>
+							<div><dt>Writes</dt><dd>origin checked on every one</dd></div>
+							<div><dt>Media</dt><dd>sandboxed by its CSP</dd></div>
+						</dl>
+					</article>
+				</div>
 			</section>
 
-			<section id="features" class="section">
-				<h2 class="section-head"><span class="index">01</span>Features<span class="rule"></span></h2>
+			<section class="section">
+				<h2 class="section-head"><span class="index">02</span>And the player itself<span class="rule"></span></h2>
 				<ol class="index-list">
 					<li>
-						<div><h3>Original files</h3><p>Up to FLAC 24/192, with the decoded format shown in the player. Optional transcoding to MP3, Opus or AAC, switched from the quality badge. Casts to Chromecast from Chrome on Android and to AirPlay from Safari.</p></div>
+						<div><h3>Original files</h3><p>Up to FLAC 24/192, with the decoded format shown in the player. Optional transcoding to MP3, Opus or AAC from the quality badge. Casts to Chromecast and AirPlay.</p></div>
 						<span class="chip">24/192</span>
 					</li>
 					<li>
-						<div><h3>Coloured by the artwork</h3><p>The interface takes its accent from the cover that is playing, in two themes: Liquid (dark glass) and Paper (parchment and ink). This page does the same with the screenshots on it; the switch is in the top bar.</p></div>
+						<div><h3>Coloured by the artwork</h3><p>The interface takes its colour from the cover that is playing, in Liquid (dark glass) or Paper (parchment and ink). This page does the same with its screenshots; the switch is in the top bar.</p></div>
 						<span class="chip">2 themes</span>
 					</li>
 					<li>
-						<div><h3>Library</h3><p>Albums, artists, genres, playlists, favourites and the folders on disk, with synced lyrics and recommendations from your music server. Playlists reorder by dragging or with the arrow keys. Ratings of one to five stars on Navidrome.</p></div>
-						<span class="chip">lyrics</span>
+						<div><h3>Synced lyrics</h3><p>From your music server, or from LRCLIB when you turn it on. A living-room screen shows what plays full screen with the lyrics, for a TV across the room.</p></div>
+						<span class="chip">LRCLIB</span>
 					</li>
 					<li>
-						<div><h3>Instant mix</h3><p>Up to 100 similar tracks from a track, an album or an artist, with AudioMuse-AI's sonic similarity where it is installed.</p></div>
-						<span class="chip">100 tracks</span>
-					</li>
-					<li>
-						<div><h3>Shared links and listening together</h3><p>Links to songs, albums and playlists that anyone can play without an account, for 1, 7 or 30 days. A live link plays what you play, as you play it, with reactions.</p></div>
-						<span class="chip">1 · 7 · 30 d</span>
-					</li>
-					<li>
-						<div><h3>Phones and living rooms</h3><p>On a phone the navigation and the player share one panel at the foot of the screen, and the full player pulls down to close. A living-room screen shows what plays full screen with the synced lyrics.</p></div>
+						<div><h3>One app across your devices</h3><p>Installs on phones and desktops. The queue and settings follow you, and one browser can pause, skip or take over the queue of another.</p></div>
 						<span class="chip">PWA</span>
 					</li>
 					<li>
-						<div><h3>Across devices</h3><p>The queue and settings sync between browsers. One browser can pause, skip or seek another signed in to the same account, and move the queue to it. Installs as an app on phones and desktops.</p></div>
-						<span class="chip">sync</span>
+						<div><h3>Your listening, on your server</h3><p>Every play kept in Heddohon's own database: top artists, albums and hours, and the albums you played on this date in earlier years. Instant mixes of up to 100 similar tracks.</p></div>
+						<span class="chip">history</span>
 					</li>
 					<li>
-						<div><h3>Crossfade and equaliser</h3><p>Both off until switched on. Tracks that follow each other on an album get a tight handoff instead of the crossfade. The 10-band equaliser is kept per browser.</p></div>
-						<span class="chip">10 bands</span>
-					</li>
-					<li>
-						<div><h3>History</h3><p>Scrobbling to Last.fm and ListenBrainz through Navidrome, ReplayGain, a sleep timer. Every play is kept on your own server, summed up as top artists, albums, tracks and hours, with the albums played on this date in earlier years.</p></div>
-						<span class="chip">scrobble</span>
-					</li>
-					<li>
-						<div><h3>SQLite or PostgreSQL</h3><p>SQLite by default, PostgreSQL when configured, with a one-time import from SQLite.</p></div>
-						<span class="chip">db</span>
+						<div><h3>Navidrome, Subsonic or Jellyfin</h3><p>Signs in with the music server's own accounts. SQLite by default, or PostgreSQL.</p></div>
+						<span class="chip">3 servers</span>
 					</li>
 				</ol>
 			</section>
 
 			<section id="screens" class="section">
-				<h2 class="section-head"><span class="index">02</span>Screens<span class="rule"></span></h2>
+				<h2 class="section-head"><span class="index">03</span>Screens<span class="rule"></span></h2>
 				<div class="shots">
 					<figure class="shot" data-tint>
-						<img src="assets/shots/lyrics.jpg" loading="lazy" alt="Synced lyrics in the now-playing panel, the current line highlighted" />
+						<img src="assets/shots/lyrics.jpg" width="1800" height="1200" loading="lazy" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" />
 						<figcaption><span class="index">a</span>Synced lyrics, in place of the artwork</figcaption>
 					</figure>
 					<figure class="shot" data-tint>
-						<img src="assets/shots/recommendations.jpg" loading="lazy" alt="An album page with more from the artist below the track list" />
+						<img src="assets/shots/recommendations.jpg" width="1800" height="1200" loading="lazy" alt="An album page scrolled to more albums from the same artist" />
 						<figcaption><span class="index">b</span>More from the artist, under the track list</figcaption>
 					</figure>
 					<figure class="shot shot--wide" data-tint>
-						<img src="assets/shots/share.jpg" loading="lazy" alt="A shared song, playing in the browser without an account" />
+						<img src="assets/shots/share.jpg" width="1800" height="1125" loading="lazy" alt="A shared song, playing in the browser without an account" />
 						<figcaption><span class="index">c</span>A shared song, for anyone with the link</figcaption>
 					</figure>
 				</div>
+				<div class="phones">
+					<figure class="shot phone" data-tint>
+						<img src="assets/shots/phone-album.jpg" width="786" height="1704" loading="lazy" alt="An album page on a phone, with what is playing and four tabs in one panel at the foot of the screen" />
+						<figcaption><span class="index">d</span>The player and the tabs, one panel</figcaption>
+					</figure>
+					<figure class="shot phone" data-tint>
+						<img src="assets/shots/phone-player.jpg" width="786" height="1704" loading="lazy" alt="The full player on a phone, with the cover filling the top of the screen" />
+						<figcaption><span class="index">e</span>Pulled up from it, and down to close</figcaption>
+					</figure>
+					<div class="phones-text">
+						<h3>On a phone</h3>
+						<p>
+							What is playing and the four tabs sit in one panel at the foot of the screen, within reach of a thumb. A
+							swipe on it skips, a tap opens the full player, and a pull closes it again. The tabs fold away while you
+							scroll down a page.
+						</p>
+					</div>
+				</div>
+				<p class="credits">
+					Music in these screenshots: songs and cover art by Josh Woodward
+					(<a href="https://www.joshwoodward.com/">joshwoodward.com</a>), including "The Nest", "Insomnia", "Only
+					Whispering" and "California Lullabye", under
+					<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>; J.S. Bach, The Art of the Fugue,
+					played by Kimiko Ishizaka, dedicated to the public domain
+					(<a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>). They are captured by
+					<a href="https://github.com/zorcerer/heddohon-site/tree/main/screenshots">one script</a> against a fresh
+					Navidrome.
+				</p>
 			</section>
 
 			<section id="install" class="section">
-				<h2 class="section-head"><span class="index">03</span>Install<span class="rule"></span></h2>
+				<h2 class="section-head"><span class="index">04</span>Install<span class="rule"></span></h2>
 				<div class="install">
 					<div class="terminal glass float">
 						<div class="terminal-top">
@@ -189,7 +242,7 @@ docker compose up -d</code></pre>
 			</section>
 
 			<section id="docs" class="section">
-				<h2 class="section-head"><span class="index">04</span>Documentation<span class="rule"></span></h2>
+				<h2 class="section-head"><span class="index">05</span>Documentation<span class="rule"></span></h2>
 				<ul class="docs">
 					<li><a href="https://github.com/zorcerer/heddohon/blob/main/docs/configuration.md"><span>Configuration</span><span class="leader"></span><em>Environment variables, reverse proxies, PostgreSQL, Unraid</em></a></li>
 					<li><a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md"><span>Security</span><span class="leader"></span><em>Threat model, known gaps, reporting a vulnerability</em></a></li>
