@@ -22,16 +22,24 @@
 		<meta name="twitter:card" content="summary_large_image" />
 
 		<!-- The saved theme is applied before the first paint, so Paper does not
-		     arrive as a flash of Liquid. -->
+		     arrive as a flash of Liquid. `js` hides what `site.js` brings in on
+		     scroll; it is taken off again after 3 seconds if that script never
+		     ran, so the page is not left with parts of it hidden. -->
 		<script>
 			try {
 				if (localStorage.getItem('hh-theme') === 'light') document.documentElement.dataset.theme = 'light';
 			} catch {}
+			document.documentElement.classList.add('js');
+			setTimeout(function () {
+				if (!window.hhReady) document.documentElement.classList.remove('js');
+			}, 3000);
 		</script>
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
-		<div class="room" aria-hidden="true"></div>
+		<div class="room" aria-hidden="true"><div class="aurora"></div></div>
+		<div class="arrival" aria-hidden="true"></div>
+		<div class="veil" aria-hidden="true"></div>
 
 		<header class="bar glass float">
 			<a class="brand" href="#top" aria-label="Heddohon, top of the page">
@@ -44,7 +52,9 @@
 				<span>Heddohon</span>
 			</a>
 			<nav aria-label="Sections">
+				<span class="marker" aria-hidden="true"></span>
 				<a href="#features">Why</a>
+				<a href="#player">Player</a>
 				<a href="#screens">Screens</a>
 				<a href="#install">Install</a>
 				<a href="#docs">Docs</a>
@@ -56,13 +66,19 @@
 			<a class="key" href="https://github.com/zorcerer/heddohon" aria-label="Source on GitHub" title="Source on GitHub">
 				<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
 			</a>
+			<span class="progress" aria-hidden="true"><i></i></span>
 		</header>
 
 		<main id="top">
 			<section class="hero">
 				<div class="hero-text">
-					<p class="eyebrow">ヘッドホン · headphones</p>
-					<h1>Heddohon</h1>
+					<p class="eyebrow">
+						<span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+						ヘッドホン · headphones
+					</p>
+					<h1 aria-label="Heddohon">
+						<span aria-hidden="true" style="--i: 0">H</span><span aria-hidden="true" style="--i: 1">e</span><span aria-hidden="true" style="--i: 2">d</span><span aria-hidden="true" style="--i: 3">d</span><span aria-hidden="true" style="--i: 4">o</span><span aria-hidden="true" style="--i: 5">h</span><span aria-hidden="true" style="--i: 6">o</span><span aria-hidden="true" style="--i: 7">n</span>
+					</h1>
 					<p class="lede">A web music player you host yourself,<br /><span>for Navidrome, Subsonic and Jellyfin.</span></p>
 					<p class="pitch">Listen together over a live link, share a song with anyone, and keep your music server off the internet.</p>
 					<p class="chips">
@@ -73,29 +89,49 @@
 					<p class="actions">
 						<a class="key key--primary" href="#install">
 							<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M4 2.5v11l9-5.5z" /></svg>
-							Install
+							<span>Install</span>
 						</a>
-						<a class="key" href="https://github.com/zorcerer/heddohon/releases">Releases</a>
-						<a class="key" href="https://github.com/zorcerer/heddohon">Source</a>
+						<a class="key" href="https://github.com/zorcerer/heddohon/releases"><span>Releases</span></a>
+						<a class="key" href="https://github.com/zorcerer/heddohon"><span>Source</span></a>
 					</p>
 				</div>
-				<figure class="sleeve" data-tint>
-					<div class="sleeve-turn">
-						<img
-							src="assets/shots/album.jpg"
-							width="1800"
-							height="1200"
-							alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right, both tinted gold by the cover"
-						/>
-						<span class="sheen" aria-hidden="true"></span>
-					</div>
-				</figure>
+				<div class="stage">
+					<figure class="sleeve" data-tint>
+						<div class="sleeve-turn">
+							<div class="plate">
+								<img
+									src="assets/shots/album.jpg"
+									width="1800"
+									height="1200"
+									alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right, both tinted gold by the cover"
+								/>
+								<span class="sheen" aria-hidden="true"></span>
+							</div>
+							<img class="pocket" src="assets/shots/phone-player.jpg" width="786" height="1704" alt="" aria-hidden="true" />
+						</div>
+					</figure>
+				</div>
 			</section>
 
+			<!-- Each name is on the page below. `site.js` doubles the run for the loop. -->
+			<div class="ticker" aria-hidden="true">
+				<div class="ticker-run">
+					<span>Navidrome</span><span>Subsonic</span><span>Jellyfin</span><span>FLAC 24/192</span><span>Opus</span><span>AAC</span><span>MP3</span><span>Chromecast</span><span>AirPlay</span><span>LRCLIB</span><span>AutoEq</span><span>SQLite</span><span>PostgreSQL</span><span>linux/amd64</span><span>linux/arm64</span><span>Linux</span><span>Windows</span><span>Android</span><span>MIT</span>
+				</div>
+			</div>
+
 			<section id="features" class="section">
-				<h2 class="section-head"><span class="index">01</span>What it does differently<span class="rule"></span></h2>
+				<h2 class="section-head" data-reveal="sweep"><span class="index">01</span>What it does differently<span class="rule"></span></h2>
 				<div class="pillars">
-					<article class="pillar">
+					<article class="pillar pane" data-reveal="rise" data-live>
+						<div class="vig vig-together" aria-hidden="true">
+							<div class="party">
+								<span class="bars"><i></i><i></i><i></i><i></i></span>
+								<span class="party-line"></span>
+								<span class="faces"><i></i><i></i><i></i></span>
+							</div>
+							<div class="reactions"><span>🔥</span><span>❤️</span><span>👏</span><span>😂</span><span>🎉</span></div>
+						</div>
 						<p class="pillar-label"><span class="index">a</span>Listen together</p>
 						<h3>Play for people who are not in the room</h3>
 						<p>
@@ -108,7 +144,11 @@
 							<div><dt>Ends</dt><dd>when you end it, or after 12 h</dd></div>
 						</dl>
 					</article>
-					<article class="pillar">
+					<article class="pillar pane" data-reveal="rise" data-live>
+						<div class="vig vig-share" aria-hidden="true">
+							<div class="link"><span class="link-path">/share/</span><span class="token" data-token>q7Xc2mLr9TzAe4Vb0KsYd8HuWn3JpGf6RiQo1EtZx5M</span></div>
+							<div class="expiry" data-expiry><i class="expiry-mark"></i><span>1 day</span><span>7 days</span><span>30 days</span></div>
+						</div>
 						<p class="pillar-label"><span class="index">b</span>Shared links</p>
 						<h3>A song, an album or a playlist, for anyone with the link</h3>
 						<p>
@@ -121,10 +161,18 @@
 							<div><dt>Stored as</dt><dd>an HMAC digest</dd></div>
 						</dl>
 					</article>
-					<article class="pillar">
+					<article class="pillar pane" data-reveal="rise" data-live>
+						<div class="vig vig-route" role="img" aria-label="The browser talks to Heddohon, and Heddohon talks to the music server inside your network">
+							<span class="node">browser</span>
+							<span class="wire"><i></i></span>
+							<span class="zone">
+								<span class="node node--hh">Heddohon</span>
+								<span class="wire"><i></i></span>
+								<span class="node">music server</span>
+							</span>
+						</div>
 						<p class="pillar-label"><span class="index">c</span>Security</p>
 						<h3>Your music server stays off the internet</h3>
-						<pre class="route"><span>browser</span> ─► <b>Heddohon</b> ─► <span>music server</span></pre>
 						<p>
 							The browser only talks to Heddohon, which fetches every byte from the music server itself. The upstream
 							address appears in no page, script or error. The threat model, the known gaps and each audit are in
@@ -140,74 +188,123 @@
 				</div>
 			</section>
 
-			<section class="section">
-				<h2 class="section-head"><span class="index">02</span>And the player itself<span class="rule"></span></h2>
-				<ol class="index-list">
-					<li>
-						<div><h3>Original files</h3><p>Up to FLAC 24/192, with the decoded format shown in the player. Optional transcoding to MP3, Opus or AAC from the quality badge. Casts to Chromecast and AirPlay.</p></div>
-						<span class="chip">24/192</span>
-					</li>
-					<li>
-						<div><h3>Coloured by the artwork</h3><p>The interface takes its colour from the cover that is playing, in Liquid (dark glass) or Paper (parchment and ink). This page does the same with its screenshots; the switch is in the top bar.</p></div>
-						<span class="chip">2 themes</span>
-					</li>
-					<li>
-						<div><h3>Synced lyrics</h3><p>From your music server, or from LRCLIB when you turn it on. A living-room screen shows what plays full screen with the lyrics, for a TV across the room.</p></div>
-						<span class="chip">LRCLIB</span>
-					</li>
-					<li>
-						<div><h3>One app across your devices</h3><p>A desktop app for Linux and Windows and an experimental one for Android, on each release, and it installs from the browser on a Mac, an iPhone and an iPad. The queue and settings follow you, and one browser can pause, skip or take over the queue of another.</p></div>
-						<span class="chip">apps</span>
-					</li>
-					<li>
-						<div><h3>An equaliser that knows your headphones</h3><p>Ten bands, kept per browser, with a correction for one of about 8,850 headphones measured by AutoEq, or from a ParametricEQ.txt of your own. Crossfades leave the joins of an album alone.</p></div>
-						<span class="chip">AutoEq</span>
-					</li>
-					<li>
-						<div><h3>Internet radio</h3><p>The stations Navidrome lists, played through your server, from a stream address or an .m3u or .pls playlist.</p></div>
-						<span class="chip">radio</span>
-					</li>
-					<li>
-						<div><h3>Your listening, on your server</h3><p>Every play kept in Heddohon's own database: top artists, albums and hours, and the albums you played on this date in earlier years. Instant mixes of up to 100 similar tracks.</p></div>
-						<span class="chip">history</span>
-					</li>
-					<li>
-						<div><h3>Navidrome, Subsonic or Jellyfin</h3><p>Signs in with the music server's own accounts. SQLite by default, or PostgreSQL.</p></div>
-						<span class="chip">3 servers</span>
-					</li>
-				</ol>
+			<section id="player" class="section">
+				<h2 class="section-head" data-reveal="sweep"><span class="index">02</span>And the player itself<span class="rule"></span></h2>
+				<div class="bento">
+					<article class="cell cell--5 pane" data-reveal="rise" data-live>
+						<div class="vig vig-quality" aria-hidden="true">
+							<span class="badge badge--hires" data-quality><span class="swap">FLAC 24/192</span></span>
+							<div class="seek"><i></i></div>
+						</div>
+						<h3>Original files</h3>
+						<p>Up to FLAC 24/192, with the decoded format shown in the player. Optional transcoding to MP3, Opus or AAC from the quality badge. Casts to Chromecast and AirPlay.</p>
+					</article>
+					<article class="cell cell--7 pane" data-reveal="rise">
+						<div class="vig vig-tint" role="group" aria-label="Colour the page as a cover would">
+							<button class="swatch" type="button" aria-pressed="false" aria-label="Amber" data-h="36" data-s="38" data-l="52" style="--h: 36"></button>
+							<button class="swatch" type="button" aria-pressed="false" aria-label="Rust" data-h="12" data-s="38" data-l="48" style="--h: 12"></button>
+							<button class="swatch" type="button" aria-pressed="false" aria-label="Green" data-h="98" data-s="34" data-l="46" style="--h: 98"></button>
+							<button class="swatch" type="button" aria-pressed="false" aria-label="Teal" data-h="174" data-s="36" data-l="46" style="--h: 174"></button>
+							<button class="swatch" type="button" aria-pressed="false" aria-label="Blue" data-h="216" data-s="38" data-l="54" style="--h: 216"></button>
+							<button class="swatch" type="button" aria-pressed="false" aria-label="Violet" data-h="276" data-s="34" data-l="56" style="--h: 276"></button>
+							<button class="swatch" type="button" aria-pressed="false" aria-label="Rose" data-h="338" data-s="38" data-l="54" style="--h: 338"></button>
+						</div>
+						<h3>Coloured by the artwork</h3>
+						<p>The interface takes its colour from the cover that is playing, in Liquid (dark glass) or Paper (parchment and ink). This page does the same with its screenshots. Press a square above to colour it by hand; the theme switch is in the top bar.</p>
+					</article>
+					<article class="cell cell--4 pane" data-reveal="rise" data-live>
+						<div class="vig vig-lyrics" aria-hidden="true">
+							<div class="lyrics-window">
+								<ol class="lines" data-lines>
+									<li style="--w: 58%"></li><li style="--w: 74%"></li><li style="--w: 46%"></li><li style="--w: 82%"></li><li style="--w: 64%"></li><li style="--w: 52%"></li><li style="--w: 78%"></li><li style="--w: 40%"></li><li style="--w: 68%"></li>
+								</ol>
+							</div>
+						</div>
+						<h3>Synced lyrics</h3>
+						<p>From your music server, or from LRCLIB when you turn it on. A living-room screen shows what plays full screen with the lyrics, for a TV across the room.</p>
+					</article>
+					<article class="cell cell--4 pane" data-reveal="rise" data-live>
+						<div class="vig vig-devices" aria-hidden="true">
+							<span class="device device--desk"><span class="bars"><i></i><i></i><i></i><i></i></span></span>
+							<span class="device device--tablet"><span class="bars"><i></i><i></i><i></i><i></i></span></span>
+							<span class="device device--phone"><span class="bars"><i></i><i></i><i></i><i></i></span></span>
+						</div>
+						<h3>One app across your devices</h3>
+						<p>A desktop app for Linux and Windows and an experimental one for Android, on each release, and it installs from the browser on a Mac, an iPhone and an iPad. The queue and settings follow you, and one browser can pause, skip or take over the queue of another.</p>
+					</article>
+					<article class="cell cell--4 pane" data-reveal="rise" data-live>
+						<div class="vig vig-eq" aria-hidden="true" data-eq>
+							<span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span>
+						</div>
+						<h3>An equaliser that knows your headphones</h3>
+						<p>Ten bands, kept per browser, with a correction for one of about 8,850 headphones measured by AutoEq, or from a ParametricEQ.txt of your own. Crossfades leave the joins of an album alone.</p>
+					</article>
+					<article class="cell cell--4 pane" data-reveal="rise" data-live>
+						<div class="vig vig-radio" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
+						<h3>Internet radio</h3>
+						<p>The stations Navidrome lists, played through your server, from a stream address or an .m3u or .pls playlist.</p>
+					</article>
+					<article class="cell cell--4 pane" data-reveal="rise" data-live>
+						<!-- The figures and the shape of the chart are those of the Your listening screenshot below. -->
+						<div class="vig vig-hours" aria-hidden="true" data-hours>
+							<p class="tally"><span><b data-count="568">568</b> plays</span><span><b data-count="34">34</b> hours</span></p>
+							<div class="hours">
+								<i style="--v: 0.2"></i><i style="--v: 0.02"></i><i style="--v: 0.02"></i><i style="--v: 0.02"></i><i style="--v: 0.02"></i><i style="--v: 0.02"></i><i style="--v: 0.08"></i><i style="--v: 0.22"></i><i style="--v: 0.5"></i><i style="--v: 0.43"></i><i style="--v: 0.6"></i><i style="--v: 0.04"></i><i style="--v: 0.18"></i><i style="--v: 0.36"></i><i style="--v: 0.08"></i><i style="--v: 0.03"></i><i style="--v: 0.29"></i><i style="--v: 0.33"></i><i style="--v: 0.63"></i><i style="--v: 0.69"></i><i style="--v: 0.77"></i><i style="--v: 0.57"></i><i class="peak" style="--v: 1"></i><i style="--v: 0.33"></i>
+							</div>
+						</div>
+						<h3>Your listening, on your server</h3>
+						<p>Every play kept in Heddohon's own database: top artists, albums and hours, and the albums you played on this date in earlier years. Instant mixes of up to 100 similar tracks.</p>
+					</article>
+					<article class="cell cell--4 pane" data-reveal="rise" data-live>
+						<div class="vig vig-servers" aria-hidden="true"><span>Navidrome</span><span>Subsonic</span><span>Jellyfin</span></div>
+						<h3>Navidrome, Subsonic or Jellyfin</h3>
+						<p>Signs in with the music server's own accounts. SQLite by default, or PostgreSQL.</p>
+					</article>
+				</div>
 			</section>
 
 			<section id="screens" class="section">
-				<h2 class="section-head"><span class="index">03</span>Screens<span class="rule"></span></h2>
-				<div class="shots">
-					<figure class="shot" data-tint>
-						<img src="assets/shots/lyrics.jpg" width="1800" height="1200" loading="lazy" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" />
-						<figcaption><span class="index">a</span>Synced lyrics, in place of the artwork</figcaption>
-					</figure>
-					<figure class="shot" data-tint>
-						<img src="assets/shots/recommendations.jpg" width="1800" height="1200" loading="lazy" alt="An album page scrolled to more albums from the same artist" />
-						<figcaption><span class="index">b</span>More from the artist, under the track list</figcaption>
-					</figure>
-					<figure class="shot shot--wide" data-tint>
-						<img src="assets/shots/listening.jpg" width="1800" height="1200" loading="lazy" alt="Your listening over the last 30 days: 568 plays, 34 hours, a chart of plays by the hour of the day and one by the day of the week, and the top artists and albums" />
-						<figcaption><span class="index">c</span>Your listening: the history summed up, by 30 days, 90 days, the year or everything kept</figcaption>
-					</figure>
-					<figure class="shot shot--wide" data-tint>
-						<img src="assets/shots/share.jpg" width="1800" height="1125" loading="lazy" alt="A shared song, playing in the browser without an account" />
-						<figcaption><span class="index">d</span>A shared song, for anyone with the link</figcaption>
-					</figure>
+				<h2 class="section-head" data-reveal="sweep"><span class="index">03</span>Screens<span class="rule"></span></h2>
+				<div class="viewer pane" data-tint data-viewer data-live data-reveal="rise">
+					<div class="viewer-top">
+						<div class="tabs" role="tablist" aria-label="Screens">
+							<span class="tab-mark" aria-hidden="true"></span>
+							<button class="tab" type="button" role="tab" id="tab-lyrics" aria-controls="slide-lyrics" aria-selected="true">Lyrics</button>
+							<button class="tab" type="button" role="tab" id="tab-more" aria-controls="slide-more" aria-selected="false" tabindex="-1">More from the artist</button>
+							<button class="tab" type="button" role="tab" id="tab-listening" aria-controls="slide-listening" aria-selected="false" tabindex="-1">Your listening</button>
+							<button class="tab" type="button" role="tab" id="tab-share" aria-controls="slide-share" aria-selected="false" tabindex="-1">A shared song</button>
+						</div>
+						<span class="viewer-timer" aria-hidden="true"><i></i></span>
+					</div>
+					<div class="slides">
+						<figure class="slide on" id="slide-lyrics" role="tabpanel" aria-labelledby="tab-lyrics">
+							<img src="assets/shots/lyrics.jpg" width="1800" height="1200" loading="lazy" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" />
+							<figcaption><span class="index">a</span>Synced lyrics, in place of the artwork</figcaption>
+						</figure>
+						<figure class="slide" id="slide-more" role="tabpanel" aria-labelledby="tab-more">
+							<img src="assets/shots/recommendations.jpg" width="1800" height="1200" loading="lazy" alt="An album page scrolled to more albums from the same artist" />
+							<figcaption><span class="index">b</span>More from the artist, under the track list</figcaption>
+						</figure>
+						<figure class="slide" id="slide-listening" role="tabpanel" aria-labelledby="tab-listening">
+							<img src="assets/shots/listening.jpg" width="1800" height="1200" loading="lazy" alt="Your listening over the last 30 days: 568 plays, 34 hours, a chart of plays by the hour of the day and one by the day of the week, and the top artists and albums" />
+							<figcaption><span class="index">c</span>Your listening: the history summed up, by 30 days, 90 days, the year or everything kept</figcaption>
+						</figure>
+						<figure class="slide" id="slide-share" role="tabpanel" aria-labelledby="tab-share">
+							<img src="assets/shots/share.jpg" width="1800" height="1125" loading="lazy" alt="A shared song, playing in the browser without an account" />
+							<figcaption><span class="index">d</span>A shared song, for anyone with the link</figcaption>
+						</figure>
+					</div>
 				</div>
 				<div class="phones">
-					<figure class="shot phone" data-tint>
+					<figure class="shot phone" data-tint data-reveal="arrive">
 						<img src="assets/shots/phone-album.jpg" width="786" height="1704" loading="lazy" alt="An album page on a phone, with what is playing and four tabs in one panel at the foot of the screen" />
 						<figcaption><span class="index">e</span>The player and the tabs, one panel</figcaption>
 					</figure>
-					<figure class="shot phone" data-tint>
+					<figure class="shot phone" data-tint data-reveal="arrive">
 						<img src="assets/shots/phone-player.jpg" width="786" height="1704" loading="lazy" alt="The full player on a phone, with the cover filling the top of the screen" />
 						<figcaption><span class="index">f</span>Pulled up from it, and down to close</figcaption>
 					</figure>
-					<div class="phones-text">
+					<div class="phones-text" data-reveal="rise">
 						<h3>On a phone</h3>
 						<p>
 							What is playing and the four tabs sit in one panel at the foot of the screen, within reach of a thumb. A
@@ -216,7 +313,7 @@
 						</p>
 					</div>
 				</div>
-				<p class="credits">
+				<p class="credits" data-reveal="rise">
 					Music in these screenshots: songs and cover art by Josh Woodward
 					(<a href="https://www.joshwoodward.com/">joshwoodward.com</a>), including "The Nest", "Insomnia", "I
 					Will Not Let You Let Me Down", "Only Whispering" and "California Lullabye", under
@@ -229,12 +326,12 @@
 			</section>
 
 			<section id="install" class="section">
-				<h2 class="section-head"><span class="index">04</span>Install<span class="rule"></span></h2>
+				<h2 class="section-head" data-reveal="sweep"><span class="index">04</span>Install<span class="rule"></span></h2>
 				<div class="install">
-					<div class="terminal glass float">
+					<div class="terminal pane" data-reveal="rise">
 						<div class="terminal-top">
 							<span class="label">docker compose</span>
-							<button class="key key--small copy" type="button" data-copy="quickstart">Copy</button>
+							<button class="key key--small copy" type="button" data-copy="quickstart"><span>Copy</span></button>
 						</div>
 <pre id="quickstart"><code>git clone https://github.com/zorcerer/heddohon.git && cd heddohon
 cp .env.example .env
@@ -243,32 +340,33 @@ echo "HEDDOHON_SUBSONIC_URL=http://10.0.0.10:4533" >> .env
 docker compose up -d</code></pre>
 					</div>
 					<dl class="facts">
-						<div><dt>Open</dt><dd><code>http://localhost:3000</code>, and sign in with your music server account. To expose it publicly, set <code>ORIGIN</code> and read <a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md">SECURITY.md</a>.</dd></div>
-						<div><dt>Images</dt><dd><code>ghcr.io/zorcerer/heddohon</code> and <code>zorcererd/heddohon</code></dd></div>
-						<div><dt>Platforms</dt><dd><code>linux/amd64</code> and <code>linux/arm64</code>: a Raspberry Pi 4 or 5 on a 64-bit OS, an ARM NAS, an Ampere server. 32-bit ARM is not built.</dd></div>
-						<div><dt>Tags</dt><dd><code>latest</code> is the newest release. <code>dev</code> is built from the <code>dev</code> branch once a day when it has changed and passed the test suites.</dd></div>
-						<div><dt>Unraid</dt><dd>Listed in Community Applications, from the template in <a href="https://github.com/zorcerer/heddohon/blob/main/templates/heddohon.xml"><code>templates/heddohon.xml</code></a>.<br /><a class="key key--small" href="https://ca.unraid.net/apps/heddohon-0bp7lm80vkr69w">Install on Unraid</a></dd></div>
-						<div><dt>Apps</dt><dd>For Linux an AppImage, for Windows an installer and a portable <code>.exe</code> (not signed), and for Android an experimental APK. Each opens the server you run, and all are files on the <a href="https://github.com/zorcerer/heddohon/releases/latest">latest release</a>. <a href="https://github.com/zorcerer/heddohon/wiki/Apps">More about them</a>.</dd></div>
-						<div><dt>No Docker</dt><dd>On Node 22 or later: <code>npm ci && npm run build && node build/index.js</code></dd></div>
+						<div data-reveal="rise"><dt>Open</dt><dd><code>http://localhost:3000</code>, and sign in with your music server account. To expose it publicly, set <code>ORIGIN</code> and read <a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md">SECURITY.md</a>.</dd></div>
+						<div data-reveal="rise"><dt>Images</dt><dd><code>ghcr.io/zorcerer/heddohon</code> and <code>zorcererd/heddohon</code></dd></div>
+						<div data-reveal="rise"><dt>Platforms</dt><dd><code>linux/amd64</code> and <code>linux/arm64</code>: a Raspberry Pi 4 or 5 on a 64-bit OS, an ARM NAS, an Ampere server. 32-bit ARM is not built.</dd></div>
+						<div data-reveal="rise"><dt>Tags</dt><dd><code>latest</code> is the newest release. <code>dev</code> is built from the <code>dev</code> branch once a day when it has changed and passed the test suites.</dd></div>
+						<div data-reveal="rise"><dt>Unraid</dt><dd>Listed in Community Applications, from the template in <a href="https://github.com/zorcerer/heddohon/blob/main/templates/heddohon.xml"><code>templates/heddohon.xml</code></a>.<br /><a class="key key--small" href="https://ca.unraid.net/apps/heddohon-0bp7lm80vkr69w"><span>Install on Unraid</span></a></dd></div>
+						<div data-reveal="rise"><dt>Apps</dt><dd>For Linux an AppImage, for Windows an installer and a portable <code>.exe</code> (not signed), and for Android an experimental APK. Each opens the server you run, and all are files on the <a href="https://github.com/zorcerer/heddohon/releases/latest">latest release</a>. <a href="https://github.com/zorcerer/heddohon/wiki/Apps">More about them</a>.</dd></div>
+						<div data-reveal="rise"><dt>No Docker</dt><dd>On Node 22 or later: <code>npm ci && npm run build && node build/index.js</code></dd></div>
 					</dl>
 				</div>
 			</section>
 
 			<section id="docs" class="section">
-				<h2 class="section-head"><span class="index">05</span>Documentation<span class="rule"></span></h2>
+				<h2 class="section-head" data-reveal="sweep"><span class="index">05</span>Documentation<span class="rule"></span></h2>
 				<ul class="docs">
-					<li><a href="https://github.com/zorcerer/heddohon/wiki/Configuration"><span>Configuration</span><span class="leader"></span><em>Environment variables, reverse proxies, PostgreSQL, Unraid</em></a></li>
-					<li><a href="https://github.com/zorcerer/heddohon/wiki/Apps"><span>Apps</span><span class="leader"></span><em>The desktop app for Linux and Windows, the Android app, and a sign-in in front of them</em></a></li>
-					<li><a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md"><span>Security</span><span class="leader"></span><em>Threat model, known gaps, reporting a vulnerability</em></a></li>
-					<li><a href="https://github.com/zorcerer/heddohon/wiki/Audio"><span>Audio</span><span class="leader"></span><em>Formats, transcoding, and what high resolution means in a browser</em></a></li>
-					<li><a href="https://github.com/zorcerer/heddohon/wiki/Architecture"><span>Architecture</span><span class="leader"></span><em>How the server, the client and the music server fit together</em></a></li>
-					<li><a href="https://github.com/zorcerer/heddohon/wiki/Design-notes"><span>Design notes</span><span class="leader"></span><em>Why the interface looks and behaves as it does</em></a></li>
-					<li><a href="https://github.com/zorcerer/heddohon/blob/main/CONTRIBUTING.md"><span>Contributing</span><span class="leader"></span><em>Reporting bugs, suggesting features, and sending pull requests</em></a></li>
+					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Configuration"><span>Configuration</span><span class="leader"></span><em>Environment variables, reverse proxies, PostgreSQL, Unraid</em></a></li>
+					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Apps"><span>Apps</span><span class="leader"></span><em>The desktop app for Linux and Windows, the Android app, and a sign-in in front of them</em></a></li>
+					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md"><span>Security</span><span class="leader"></span><em>Threat model, known gaps, reporting a vulnerability</em></a></li>
+					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Audio"><span>Audio</span><span class="leader"></span><em>Formats, transcoding, and what high resolution means in a browser</em></a></li>
+					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Architecture"><span>Architecture</span><span class="leader"></span><em>How the server, the client and the music server fit together</em></a></li>
+					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Design-notes"><span>Design notes</span><span class="leader"></span><em>Why the interface looks and behaves as it does</em></a></li>
+					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/blob/main/CONTRIBUTING.md"><span>Contributing</span><span class="leader"></span><em>Reporting bugs, suggesting features, and sending pull requests</em></a></li>
 				</ul>
 			</section>
 		</main>
 
 		<footer class="foot">
+			<p class="wordmark" aria-hidden="true" data-reveal="sweep">Heddohon</p>
 			<p>
 				Written with agentic assistance from Claude. The code and security posture have been reviewed by the author and by
 				multiple AI-assisted audits, documented in <a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md">SECURITY.md</a>.

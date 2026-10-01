@@ -13,13 +13,25 @@ screenshot nearest the middle of the viewport and writes `--art-h/s/l` on the
 root, so the page changes colour as it scrolls. The top bar switches between
 Liquid and Paper, stored in `localStorage`.
 
+The radii (`--r-sm` to `--r-xl`), the typefaces and the motion tokens
+(`--dur-press` 120ms, `--dur-hover` 220ms, `--dur-state` 340ms, `--dur-travel`
+480ms, `--dur-colour` 900ms, and the out, exit and spring curves) are copied
+from the application's `src/lib/styles/app.css`, and so are the animations
+built on them: the heading sweep, the list rise, the press ripple, the playing
+bars, the badge swap, the reactions and the aurora. A change to those in the
+application is copied here by hand.
+
+The page is whole without the script: the screens are four figures down the
+page and nothing is hidden. Under `prefers-reduced-motion` nothing loops, types
+or follows the scroll.
+
 ## Files
 
 | Path | Contents |
 | --- | --- |
 | `index.html` | The page |
 | `style.css` | Tokens from the app's `app.css`, and the page's layout |
-| `site.js` | Artwork tint, theme switch, sleeve tilt, copy button |
+| `site.js` | Artwork tint, theme switch, sleeve tilt, what arrives on scroll, the scenes in the cards, the screens, the terminal, copy button |
 | `assets/fonts/` | Manrope and JetBrains Mono (latin subset, variable), SIL OFL 1.1 |
 | `assets/shots/` | Screenshots, made by `screenshots/run.sh` |
 | `screenshots/` | The scripts that make them |

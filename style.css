@@ -6,7 +6,12 @@
  * artwork. Here the artwork is the screenshots. `site.js` samples the one
  * nearest the middle of the viewport and writes --art-h/s/l on the root, so
  * the room changes colour as you scroll. Depth comes from surface elevation,
- * hairline borders and blur; there is no glow and no fixed accent.
+ * hairline borders and blur; there is no fixed accent.
+ *
+ * The radii, the typefaces and every duration and curve are the application's
+ * tokens, copied below under their own names. Motion on this page uses those
+ * and the application's own figures for stagger: 60ms between the lines of a
+ * heading, 40ms between its controls, 24ms between the items of a list.
  */
 
 @font-face {
@@ -44,6 +49,13 @@
 	initial-value: 54%;
 }
 
+/* The spread of a press across a key, 0 to 1; read by the key's `::after`. */
+@property --press {
+	syntax: '<number>';
+	inherits: true;
+	initial-value: 1;
+}
+
 :root {
 	--font-display: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
 	--font-ui: 'Manrope Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -51,23 +63,48 @@
 	--display-weight: 800;
 	--display-tracking: -0.035em;
 
-	/* Each step roughly 1.35x the last, as in the app. */
+	/* Each step roughly 1.35x the last, as in the app: xl for a floating panel,
+	   lg for a card, md for a cover, sm for a control or a badge. */
 	--r-xl: 1.375rem;
 	--r-lg: 1rem;
 	--r-md: 0.75rem;
 	--r-sm: 0.5625rem;
 	--r-pill: 999px;
 
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 0.75rem;
+	--space-4: 1rem;
+	--space-5: 1.5rem;
+	--space-6: 2rem;
+	--space-7: 3rem;
+
 	--float-gap: 0.75rem;
 	--measure: 72rem;
 
+	/*
+	 * Motion, as the app has it. Four lengths: press (the answer to a click),
+	 * hover (colour in place), state (something changes form in place) and
+	 * travel (something crosses the screen). Three curves: out for almost
+	 * everything, exit for dismissal, spring for things picked up and put down.
+	 */
 	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+	--ease-exit: cubic-bezier(0.55, 0, 1, 0.45);
 	--ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
 	--dur-press: 120ms;
 	--dur-hover: 220ms;
+	--dur-state: 340ms;
 	--dur-travel: 480ms;
 	--dur-colour: 900ms;
 	--ease-colour: cubic-bezier(0.4, 0, 0.2, 1);
+	--transition: var(--dur-hover) var(--ease-out);
+
+	/* The app's loops: a reaction rises for 2400ms, a busy line sweeps in
+	   1150ms, the aurora drifts for 70s each way. */
+	--loop-rise: 2400ms;
+	--loop-sweep: 1150ms;
+	--ease-sweep: cubic-bezier(0.65, 0, 0.35, 1);
+	--loop-drift: 70s;
 
 	--art-h: 218;
 	--art-s: 16%;
@@ -80,6 +117,8 @@
 		--art-l var(--dur-colour) var(--ease-colour);
 }
 
+/* A damped spring (damping ratio 0.7), sampled; the cubic above overshoots
+   once where `linear()` is missing. */
 @supports (transition-timing-function: linear(0, 1)) {
 	:root {
 		--ease-spring: linear(
@@ -95,8 +134,10 @@
 :root,
 [data-theme='dark'] {
 	--bg-base: #0b0c0f;
+	--bg-sunken: #07080a;
 	--bg-surface: #111317;
 	--bg-raised: #181a1f;
+	--bg-hover: #202329;
 
 	--text-strong: #f7f8fa;
 	--text-default: #e1e3e7;
@@ -112,17 +153,28 @@
 	--accent-quiet: hsl(var(--art-h) min(calc(var(--art-s) + 6%), 44%) 30%);
 	--accent-contrast: #0b0c0e;
 
+	--shadow-mid: 0 8px 22px -10px rgb(0 0 0 / 0.7);
+
 	--glass-base: 58%;
 	--glass-tint: 14%;
 	--glass-blur: blur(30px) saturate(88%) brightness(0.42);
+	/* A pane with nothing scrolling under it: the same sheet without the blur,
+	   and more of its own tone in place of the blur's darkening. */
+	--pane-base: 74%;
 	--control-face: color-mix(in srgb, var(--bg-raised) 46%, transparent);
 	--control-blur: blur(14px) saturate(90%) brightness(0.72);
-	--text-muted-through: #b4b8c0;
+	--text-muted-through: #b7b9bd;
+	--text-faint-through: #95979b;
 
 	--text-shade: 0 1px 2px rgb(0 0 0 / 0.42);
+	--glow-color: var(--text-strong);
+	--glow-text: var(--text-shade),
+		0 0 4px color-mix(in srgb, hsl(var(--art-h) var(--art-s) 72%) 55%, transparent),
+		0 0 16px color-mix(in srgb, hsl(var(--art-h) var(--art-s) 66%) 45%, transparent);
 	--glass-edge: color-mix(in srgb, #ffffff 14%, transparent);
 	--glass-sheen: rgb(255 255 255 / 0.1);
 	--ambience-strength: 38%;
+	--aurora-strength: 0.5;
 	--float-shadow: 0 22px 48px -24px rgb(0 0 0 / 0.85), 0 2px 10px -4px rgb(0 0 0 / 0.6);
 
 	color-scheme: dark;
@@ -131,8 +183,10 @@
 /* ── Paper ──────────────────────────────────────────────────────────────── */
 [data-theme='light'] {
 	--bg-base: #f0e7d5;
-	--bg-surface: #f6efe1;
-	--bg-raised: #faf5ea;
+	--bg-sunken: #e6ddcc;
+	--bg-surface: #f5eee1;
+	--bg-raised: #faf5eb;
+	--bg-hover: #eae1cf;
 
 	--text-strong: #2e241a;
 	--text-default: #453b30;
@@ -159,17 +213,24 @@
 	--accent-quiet: color-mix(in oklab, hsl(var(--art-h) min(calc(var(--art-s) + 16%), 60%) 76%) 65%, #e8d4b0);
 	--accent-contrast: #fbf6ec;
 
+	--shadow-mid: 0 8px 22px -12px rgb(74 52 30 / 0.24);
+
 	--glass-base: 80%;
 	--glass-tint: 5%;
 	--glass-blur: blur(26px) sepia(0.25) saturate(90%);
+	--pane-base: 84%;
 	--control-face: color-mix(in srgb, var(--bg-raised) 64%, transparent);
 	--control-blur: blur(14px) sepia(0.2);
 	--text-muted-through: #4f463b;
+	--text-faint-through: #62584c;
 
 	--text-shade: 0 1px 0 rgb(255 250 238 / 0.55);
+	--glow-color: var(--accent);
+	--glow-text: var(--text-shade), 0 0 8px color-mix(in srgb, var(--accent) 18%, transparent);
 	--glass-edge: rgb(46 36 26 / 0.16);
 	--glass-sheen: rgb(255 250 238 / 0.6);
 	--ambience-strength: 16%;
+	--aurora-strength: 0.18;
 	--float-shadow: 0 18px 40px -22px rgb(74 52 30 / 0.34), 0 2px 8px -5px rgb(74 52 30 / 0.2);
 
 	--display-weight: 700;
@@ -201,24 +262,43 @@ body {
 	/* One pixel of shade separates a glyph from whatever the room carries. */
 	text-shadow: var(--text-shade);
 	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
 	overflow-x: clip;
+}
+
+a,
+button {
+	-webkit-tap-highlight-color: transparent;
 }
 
 a {
 	color: inherit;
 	text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
 	text-underline-offset: 0.2em;
-	transition: color var(--dur-hover) var(--ease-out);
+	transition: color var(--transition);
 }
 
 a:hover {
 	color: var(--accent);
 }
 
+button {
+	font: inherit;
+	color: inherit;
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+
 :focus-visible {
 	outline: 2px solid var(--accent);
-	outline-offset: 3px;
+	outline-offset: 2px;
 	border-radius: var(--r-sm);
+}
+
+::selection {
+	background: var(--accent-quiet);
+	color: var(--text-strong);
 }
 
 code,
@@ -234,11 +314,19 @@ img {
 	height: auto;
 }
 
+h1,
+h2,
+h3 {
+	font-family: var(--font-display);
+	color: var(--text-strong);
+	margin: 0;
+}
+
 /* ── The room ───────────────────────────────────────────────────────────── */
 /*
  * The only place the artwork's colour is painted. Four pools that fall off at
  * different rates, so it reads as light with a direction to it. Everything
- * translucent on the page shows this through its blur.
+ * translucent on the page shows this through it.
  */
 .room {
 	position: fixed;
@@ -270,15 +358,92 @@ img {
 		linear-gradient(var(--bg-base), var(--bg-base));
 }
 
+/*
+ * The app's aurora, which Settings turns on there and which is on here: bands
+ * of the room's colour and its two neighbours on the wheel, blurred, gathered
+ * across the middle of the room. It moves by `transform` on a layer blurred
+ * once, in steps of three a second (210 over 70 seconds), which is what the
+ * app measured as the cost the glass over it can carry.
+ */
+.aurora {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	opacity: var(--aurora-strength);
+}
+
+.aurora::before {
+	content: '';
+	position: absolute;
+	inset: -25% -15%;
+	background-image: repeating-linear-gradient(
+		100deg,
+		transparent 0%,
+		hsl(calc(var(--art-h) + 40) calc(var(--art-s) + 14%) calc(var(--art-l) + 6%) / 0.7) 9%,
+		hsl(var(--art-h) calc(var(--art-s) + 18%) var(--art-l) / 0.5) 16%,
+		hsl(calc(var(--art-h) - 35) calc(var(--art-s) + 14%) calc(var(--art-l) + 4%) / 0.65) 23%,
+		transparent 32%
+	);
+	background-size: 180% 100%;
+	filter: blur(48px);
+	-webkit-mask-image: radial-gradient(ellipse 70% 36% at 62% 50%, #000 10%, transparent 72%);
+	mask-image: radial-gradient(ellipse 70% 36% at 62% 50%, #000 10%, transparent 72%);
+	animation: aurora var(--loop-drift) steps(210) infinite alternate;
+	will-change: transform;
+}
+
+@keyframes aurora {
+	from {
+		transform: translate3d(-9%, 2%, 0) rotate(-2deg);
+	}
+	to {
+		transform: translate3d(9%, -3%, 0) rotate(2deg);
+	}
+}
+
+/*
+ * The page arriving, as the app arrives after its splash: the ground over
+ * everything, fading out over the travel length. It rests at 0 and is animated
+ * from 1, so a browser that never runs the animation is not left behind it.
+ */
+.arrival {
+	position: fixed;
+	inset: 0;
+	z-index: 60;
+	pointer-events: none;
+	background: var(--bg-base);
+	opacity: 0;
+	animation: arrive var(--dur-travel) var(--ease-out) forwards;
+}
+
+@keyframes arrive {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+/* The change of theme: the new ground spreads from the switch, the theme
+   changes under it, and it fades. `site.js` runs it; at rest it is not shown. */
+.veil {
+	position: fixed;
+	inset: 0;
+	z-index: 70;
+	pointer-events: none;
+	opacity: 0;
+}
+
 /* ── Material ───────────────────────────────────────────────────────────── */
 .glass {
 	--text-muted: var(--text-muted-through);
+	--text-faint: var(--text-faint-through);
 	background-color: color-mix(in srgb, var(--bg-surface) var(--glass-base), transparent);
-	background-image: linear-gradient(
-		to bottom,
-		color-mix(in srgb, var(--art) var(--glass-tint), transparent),
-		transparent
-	);
+	background-image:
+		url('assets/grain.png'),
+		linear-gradient(to bottom, color-mix(in srgb, var(--art) var(--glass-tint), transparent), transparent);
+	background-size: 128px, auto;
 	-webkit-backdrop-filter: var(--glass-blur);
 	backdrop-filter: var(--glass-blur);
 }
@@ -292,26 +457,84 @@ img {
 		var(--float-shadow);
 }
 
+/*
+ * A card. The app's card is glass; these lie on the room with nothing
+ * scrolling under them, where a blur has only a gradient to blur, so they are
+ * the same sheet without `backdrop-filter`. That leaves them free to move:
+ * the app keeps transforms off anything that blurs its backdrop.
+ *
+ * The `::before` is a pool of the room's colour under the pointer, which
+ * `site.js` places with --px and --py.
+ */
+.pane {
+	--text-muted: var(--text-muted-through);
+	--text-faint: var(--text-faint-through);
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	border-radius: var(--r-lg);
+	border: 1px solid var(--glass-edge);
+	background-color: color-mix(in srgb, var(--bg-surface) var(--pane-base), transparent);
+	background-image:
+		url('assets/grain.png'),
+		linear-gradient(to bottom, color-mix(in srgb, var(--art) var(--glass-tint), transparent), transparent);
+	background-size: 128px, auto;
+	box-shadow:
+		inset 0 1px 0 var(--glass-sheen),
+		var(--shadow-mid);
+}
+
+.pane::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+	background: radial-gradient(
+		20rem circle at var(--px, 50%) var(--py, 0%),
+		color-mix(in srgb, var(--art) 24%, transparent),
+		transparent 70%
+	);
+	opacity: 0;
+	transition: opacity var(--dur-state) var(--ease-out);
+}
+
+@media (hover: hover) {
+	.pane:hover::before {
+		opacity: 1;
+	}
+}
+
+/*
+ * The app's button: a small pane of the same material, lit on hover, and
+ * pressed without moving. A ripple spreads from the point pressed and fades
+ * with the square of its progress, a ring in the accent pulses outward from
+ * the edge, and the label gives under the press and springs back.
+ */
 .key {
+	--text-muted: var(--text-muted-through);
+	position: relative;
 	display: inline-flex;
 	align-items: center;
-	gap: 0.5rem;
+	justify-content: center;
+	gap: var(--space-2);
 	min-height: 2.75rem;
 	padding: 0 1.1rem;
-	border-radius: var(--r-md);
-	border: 1px solid var(--glass-edge);
+	border-radius: var(--r-sm);
+	border: 1px solid var(--border-strong);
 	background: var(--control-face);
 	-webkit-backdrop-filter: var(--control-blur);
 	backdrop-filter: var(--control-blur);
-	box-shadow: inset 0 1px 0 var(--glass-sheen);
-	color: var(--text-strong);
+	color: var(--text-default);
 	font: 600 0.9375rem/1 var(--font-ui);
 	text-decoration: none;
+	white-space: nowrap;
 	cursor: pointer;
 	transition:
-		color var(--dur-hover) var(--ease-out),
-		border-color var(--dur-hover) var(--ease-out),
-		transform var(--dur-press) var(--ease-out);
+		background var(--transition),
+		border-color var(--transition),
+		text-shadow var(--transition),
+		color var(--transition);
 }
 
 .key svg {
@@ -320,26 +543,78 @@ img {
 }
 
 .key:hover {
-	color: var(--accent);
-	border-color: color-mix(in srgb, var(--accent) 40%, var(--glass-edge));
+	color: var(--glow-color);
+	text-shadow: var(--glow-text);
+	border-color: var(--text-faint);
 }
 
 .key:active {
-	transform: scale(0.97);
+	background: var(--bg-hover);
+	border-color: var(--text-faint);
+}
+
+.key::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	pointer-events: none;
+	background: radial-gradient(
+		circle at var(--press-x, 50%) var(--press-y, 50%),
+		color-mix(in srgb, currentColor calc((1 - var(--press) * var(--press)) * 42%), transparent)
+			calc(var(--press) * 160%),
+		transparent calc(var(--press) * 160% + 1%)
+	);
+}
+
+.key.pressed {
+	animation:
+		press-ripple var(--dur-travel) var(--ease-out),
+		press-ring var(--dur-travel) var(--ease-out);
+}
+
+@keyframes press-ripple {
+	from {
+		--press: 0;
+	}
+	to {
+		--press: 1;
+	}
+}
+
+@keyframes press-ring {
+	from {
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 65%, transparent);
+	}
+	to {
+		box-shadow: 0 0 0 0.6rem transparent;
+	}
+}
+
+.key > * {
+	transition: scale var(--dur-state) var(--ease-spring);
+}
+
+.key:active > * {
+	scale: 0.9;
+	transition-duration: var(--dur-press);
 }
 
 .key--primary {
 	background: var(--accent);
-	border-color: transparent;
+	border-color: var(--accent);
 	color: var(--accent-contrast);
 	text-shadow: none;
 	-webkit-backdrop-filter: none;
 	backdrop-filter: none;
 }
 
-.key--primary:hover {
+.key--primary:hover,
+.key--primary:active {
 	background: var(--accent-strong);
+	border-color: var(--accent-strong);
 	color: var(--accent-contrast);
+	text-shadow: none;
 }
 
 .key--small {
@@ -350,7 +625,6 @@ img {
 
 /* Paper: flat keys pressed into the sheet, with a ring of the pale accent. */
 [data-theme='light'] .key {
-	border-color: var(--border-strong);
 	box-shadow:
 		inset 0 1px 0 rgb(255 250 238 / 0.7),
 		0 1px 0 rgb(46 36 26 / 0.08);
@@ -368,25 +642,106 @@ img {
 	border-color: var(--accent-strong);
 }
 
-.chip {
+/* The app's quality badge: mono, on the control radius, in the accent. */
+.chip,
+.badge {
 	display: inline-flex;
 	align-items: center;
 	padding: 0.15rem 0.6rem;
-	border-radius: var(--r-pill);
-	border: 1px solid color-mix(in srgb, var(--accent) 70%, transparent);
+	border-radius: var(--r-sm);
+	border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
 	color: var(--accent);
 	font: 500 0.75rem/1.5 var(--font-mono);
 	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.02em;
 	white-space: nowrap;
 }
 
 /* Hi-res is the filled badge in the stronger accent, apart by weight not hue. */
-.chip--hires {
+.chip--hires,
+.badge--hires {
 	background: var(--accent-strong);
 	border-color: var(--accent-strong);
 	color: var(--accent-contrast);
 	font-weight: 700;
 	text-shadow: none;
+}
+
+.badge--lossy {
+	border-color: var(--border-strong);
+	color: var(--text-muted);
+}
+
+/* A new label rises into place, as the badge does on a change of format. */
+.swap {
+	display: inline-block;
+	animation: badge-swap var(--dur-state) var(--ease-out);
+}
+
+@keyframes badge-swap {
+	from {
+		opacity: 0;
+		translate: 0 0.4em;
+	}
+}
+
+/*
+ * Four bars rising and falling from one baseline, the mark of the playing
+ * track in the app's track list. Each has a range and a period of its own
+ * (0.7 to 1.1s, periods that do not divide into each other), so the four
+ * never line up into a visible loop.
+ */
+.bars {
+	display: inline-flex;
+	align-items: flex-end;
+	gap: 2px;
+	height: 0.9rem;
+}
+
+.bars i {
+	width: 3px;
+	height: 100%;
+	border-radius: 1.5px;
+	background: var(--accent);
+	transform-origin: bottom;
+	animation: bar var(--period) ease-in-out var(--offset) infinite alternate;
+}
+
+.bars i:nth-child(1) {
+	--low: 0.3;
+	--high: 0.75;
+	--period: 0.83s;
+	--offset: -0.3s;
+}
+
+.bars i:nth-child(2) {
+	--low: 0.45;
+	--high: 1;
+	--period: 0.71s;
+	--offset: -0.55s;
+}
+
+.bars i:nth-child(3) {
+	--low: 0.25;
+	--high: 0.85;
+	--period: 1.07s;
+	--offset: -0.1s;
+}
+
+.bars i:nth-child(4) {
+	--low: 0.35;
+	--high: 0.65;
+	--period: 0.93s;
+	--offset: -0.7s;
+}
+
+@keyframes bar {
+	from {
+		scale: 1 var(--low);
+	}
+	to {
+		scale: 1 var(--high);
+	}
 }
 
 /* ── The bar ────────────────────────────────────────────────────────────── */
@@ -397,7 +752,7 @@ img {
 	z-index: 10;
 	display: flex;
 	align-items: center;
-	gap: 0.5rem;
+	gap: var(--space-2);
 	max-width: var(--measure);
 	margin: calc(var(--float-gap) + env(safe-area-inset-top, 0px)) auto 0;
 	width: calc(100% - 2 * var(--float-gap));
@@ -418,12 +773,18 @@ img {
 .crest {
 	width: 1.75rem;
 	height: 1.75rem;
+	transition: rotate var(--dur-travel) var(--ease-spring);
+}
+
+.brand:hover .crest {
+	rotate: -14deg;
 }
 
 .bar nav {
+	position: relative;
 	display: flex;
-	gap: 0.25rem;
-	margin-right: 0.5rem;
+	gap: var(--space-1);
+	margin-right: var(--space-2);
 }
 
 .bar nav a {
@@ -433,10 +794,39 @@ img {
 	font-size: 0.9375rem;
 	font-weight: 600;
 	text-decoration: none;
+	transition:
+		color var(--transition),
+		text-shadow var(--transition);
 }
 
-.bar nav a:hover {
-	color: var(--accent);
+.bar nav a:hover,
+.bar nav a.here {
+	color: var(--glow-color);
+	text-shadow: var(--glow-text);
+}
+
+/* The rail's marker, laid flat: a line in the accent under the section on
+   screen. It is put down on the spring; `site.js` gives it --x and --w. */
+.marker {
+	position: absolute;
+	left: 0;
+	bottom: 0.1rem;
+	width: 1px;
+	height: 2px;
+	border-radius: var(--r-pill);
+	background: var(--accent);
+	transform-origin: left;
+	translate: var(--x, 0) 0;
+	scale: var(--w, 0) 1;
+	opacity: 0;
+	transition:
+		translate var(--dur-travel) var(--ease-spring),
+		scale var(--dur-travel) var(--ease-spring),
+		opacity var(--dur-hover) var(--ease-out);
+}
+
+.marker.on {
+	opacity: 1;
 }
 
 .bar .key {
@@ -450,10 +840,32 @@ img {
 
 [data-theme='dark'] .theme-name[data-for='dark'],
 [data-theme='light'] .theme-name[data-for='light'] {
-	display: inline;
+	display: inline-block;
+	animation: badge-swap var(--dur-state) var(--ease-out);
 }
 
-@media (max-width: 44rem) {
+/* How far down the page, drawn as the player's seek bar along the bar's foot. */
+.progress {
+	position: absolute;
+	left: var(--r-xl);
+	right: var(--r-xl);
+	bottom: -1px;
+	height: 2px;
+	border-radius: var(--r-pill);
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.progress i {
+	display: block;
+	height: 100%;
+	border-radius: inherit;
+	background: var(--accent);
+	transform-origin: left;
+	scale: var(--p, 0) 1;
+}
+
+@media (max-width: 48rem) {
 	.bar nav {
 		display: none;
 	}
@@ -467,24 +879,72 @@ main,
 	padding: 0 max(1rem, env(safe-area-inset-left, 0px));
 }
 
-h1,
-h2,
-h3 {
-	font-family: var(--font-display);
-	color: var(--text-strong);
-	margin: 0;
-}
-
+/* ── Hero ───────────────────────────────────────────────────────────────── */
 .hero {
 	display: grid;
 	grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
 	align-items: center;
-	gap: 3rem;
-	padding: 5.5rem 0 3rem;
+	gap: 3.5rem;
+	padding: 5.5rem 0 5rem;
+}
+
+/*
+ * The heading block arrives as a page heading does in the app: each line
+ * revealed by a soft edge crossing it as it slides 0.5rem into place, 60ms
+ * apart, then the controls one by one, 40ms apart. The mask goes on the lines,
+ * which hold no glass; the keys take opacity and translate on themselves.
+ */
+.sweep,
+.hero-text > :not(h1, .actions),
+.in[data-reveal='sweep'] {
+	-webkit-mask-image: linear-gradient(90deg, #000 33.3%, transparent 66.6%);
+	mask-image: linear-gradient(90deg, #000 33.3%, transparent 66.6%);
+	-webkit-mask-size: 300% 100%;
+	mask-size: 300% 100%;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	animation: sweep-in var(--dur-travel) var(--ease-out) backwards;
+	animation-delay: calc(var(--line, 0) * 60ms + var(--stagger, 0) * 60ms);
+}
+
+@keyframes sweep-in {
+	from {
+		-webkit-mask-position: 100% 0;
+		mask-position: 100% 0;
+		translate: -0.5rem 0;
+	}
+	to {
+		-webkit-mask-position: 0% 0;
+		mask-position: 0% 0;
+		translate: 0 0;
+	}
+}
+
+.hero-text > :nth-child(1) { --line: 0; }
+.hero-text > :nth-child(3) { --line: 2; }
+.hero-text > :nth-child(4) { --line: 3; }
+.hero-text > :nth-child(5) { --line: 4; }
+
+.actions .key {
+	animation: control-in var(--dur-state) var(--ease-out) backwards;
+	animation-delay: calc(380ms + var(--at, 0) * 40ms);
+}
+
+.actions .key:nth-child(2) { --at: 1; }
+.actions .key:nth-child(3) { --at: 2; }
+
+@keyframes control-in {
+	from {
+		opacity: 0;
+		translate: -0.5rem 0;
+	}
 }
 
 .eyebrow {
-	margin: 0 0 0.75rem;
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	margin: 0 0 var(--space-3);
 	color: var(--text-muted);
 	font: 500 0.8125rem/1 var(--font-mono);
 	letter-spacing: 0.18em;
@@ -492,10 +952,27 @@ h3 {
 }
 
 h1 {
-	font-size: clamp(3.25rem, 6.2vw, 5.25rem);
+	font-size: clamp(3rem, 6.2vw, 5.25rem);
+	white-space: nowrap;
 	line-height: 0.95;
 	font-weight: var(--display-weight);
 	letter-spacing: var(--display-tracking);
+}
+
+/* The name, a letter at a time: each is put down on the spring, 28ms after
+   the last, as the rows of a track list are in the app. */
+h1 span {
+	display: inline-block;
+	animation: letter-in var(--dur-travel) var(--ease-spring) backwards;
+	animation-delay: calc(60ms + var(--i) * 28ms);
+}
+
+@keyframes letter-in {
+	from {
+		opacity: 0;
+		translate: 0 0.35em;
+		filter: blur(10px);
+	}
 }
 
 .lede {
@@ -511,12 +988,18 @@ h1 {
 	font-weight: 500;
 }
 
+.pitch {
+	max-width: 30rem;
+	margin: -0.5rem 0 1.5rem;
+	color: var(--text-muted);
+}
+
 .chips,
 .actions {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.5rem;
-	margin: 0 0 1rem;
+	gap: var(--space-2);
+	margin: 0 0 var(--space-4);
 }
 
 .actions {
@@ -526,26 +1009,64 @@ h1 {
 /*
  * The sleeve, after the album page: it turns toward the pointer, up to 9
  * degrees on each axis, lifts toward the viewer, and carries a highlight that
- * follows the pointer across its face. A wrapper turns so the figure keeps its
- * place in the layout. Mouse only, and not under reduced motion (`site.js`).
+ * follows the pointer across its face. At rest it stands turned a little, with
+ * the phone 3.5rem in front of it in the same space, so the two part as it
+ * turns. Mouse only, and not under reduced motion (`site.js`).
  */
+.stage {
+	perspective: 1600px;
+}
+
 .sleeve {
 	margin: 0;
-	perspective: 1600px;
 }
 
 .sleeve-turn {
 	position: relative;
-	border-radius: var(--r-xl);
-	overflow: hidden;
-	border: 1px solid var(--glass-edge);
-	box-shadow: var(--float-shadow);
-	transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(var(--lift, 0));
+	transform-style: preserve-3d;
+	transform: rotateX(var(--rx, 3deg)) rotateY(var(--ry, -8deg)) translateZ(var(--lift, 0));
 	transition: transform var(--dur-travel) var(--ease-spring);
 }
 
 .sleeve.tracking .sleeve-turn {
 	transition: transform 80ms linear;
+}
+
+/* The cover of a page arriving in the app: up from a blur, at 96 percent. */
+.plate {
+	position: relative;
+	border-radius: var(--r-xl);
+	overflow: hidden;
+	border: 1px solid var(--glass-edge);
+	box-shadow: var(--float-shadow);
+	animation: cover-arrive var(--dur-travel) var(--ease-out) 160ms backwards;
+}
+
+@keyframes cover-arrive {
+	from {
+		opacity: 0;
+		scale: 0.96;
+		filter: blur(10px);
+	}
+}
+
+.pocket {
+	position: absolute;
+	right: -3%;
+	bottom: -13%;
+	width: 23%;
+	border-radius: var(--r-lg);
+	border: 1px solid var(--glass-edge);
+	box-shadow: var(--float-shadow);
+	transform: translateZ(3.5rem);
+	animation: pocket-in var(--dur-travel) var(--ease-spring) 400ms backwards;
+}
+
+@keyframes pocket-in {
+	from {
+		opacity: 0;
+		translate: 0 2.5rem;
+	}
 }
 
 .sheen {
@@ -565,31 +1086,143 @@ h1 {
 	opacity: 1;
 }
 
-@media (max-width: 56rem) {
-	.hero {
-		grid-template-columns: 1fr;
-		padding-top: 3.5rem;
-		gap: 2.25rem;
+/* Scrolled past, the stage draws back into the room. */
+@supports (animation-timeline: view()) {
+	.stage {
+		animation: stage-leave linear both;
+		animation-timeline: view();
+		animation-range: exit 0% exit 100%;
+	}
+
+	@keyframes stage-leave {
+		to {
+			scale: 0.9;
+			opacity: 0.3;
+			translate: 0 -3rem;
+		}
 	}
 }
 
-.pitch {
-	max-width: 30rem;
-	margin: -0.5rem 0 1.5rem;
-	color: var(--text-muted);
+@media (max-width: 56rem) {
+	.hero {
+		grid-template-columns: 1fr;
+		padding: 3.5rem 0 4.5rem;
+		gap: 2.5rem;
+	}
+
+	.sleeve-turn {
+		transform: none;
+	}
+
+	.pocket {
+		right: 3%;
+		bottom: -10%;
+	}
+}
+
+/* ── The ticker ─────────────────────────────────────────────────────────── */
+/* One line of what the page names below, crossing at the aurora's pace. The
+   run is doubled by `site.js` and moved half its width, so the loop has no
+   seam; without the script it is one still line. */
+.ticker {
+	overflow: hidden;
+	padding: 0.95rem 0;
+	border-block: 1px solid var(--border-hairline);
+	-webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+	mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.ticker-run {
+	display: flex;
+	width: max-content;
+}
+
+.ticker-run.loop {
+	animation: ticker var(--loop-drift) linear infinite;
+}
+
+.ticker:hover .ticker-run {
+	animation-play-state: paused;
+}
+
+.ticker-run span {
+	display: inline-flex;
+	align-items: center;
+	color: var(--text-faint);
+	font: 500 0.8125rem/1 var(--font-mono);
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.ticker-run span::after {
+	content: '';
+	width: 4px;
+	height: 4px;
+	margin: 0 1.6rem;
+	border-radius: 50%;
+	background: var(--accent);
+}
+
+@keyframes ticker {
+	to {
+		translate: -50% 0;
+	}
+}
+
+/* ── Arriving on scroll ─────────────────────────────────────────────────── */
+/*
+ * `site.js` adds `in` when a marked element comes into view. Those that come
+ * in together are numbered in --stagger and follow each other. `rise` is the
+ * app's list item: opacity and 0.5rem, over the state length. `arrive` is its
+ * cover. `sweep` is its heading line, above.
+ *
+ * Only under `.js`, so the page is whole without the script.
+ */
+.js [data-reveal]:not(.in) {
+	opacity: 0;
+}
+
+.in[data-reveal='rise'] {
+	animation: list-rise var(--dur-state) var(--ease-out) backwards;
+	animation-delay: calc(var(--stagger, 0) * var(--step, 60ms));
+}
+
+@keyframes list-rise {
+	from {
+		opacity: 0;
+		translate: 0 0.5rem;
+	}
+}
+
+.in[data-reveal='arrive'] img {
+	animation: cover-arrive var(--dur-travel) var(--ease-out) backwards;
+	animation-delay: calc(var(--stagger, 0) * 60ms);
+}
+
+.in[data-reveal='arrive'] figcaption {
+	animation: list-rise var(--dur-state) var(--ease-out) backwards;
+	animation-delay: calc(160ms + var(--stagger, 0) * 60ms);
+}
+
+/* A vignette runs while it is on screen; `site.js` adds `live`. */
+.js [data-live]:not(.live) *,
+.js [data-live]:not(.live) *::before,
+.js [data-live]:not(.live) *::after {
+	animation-play-state: paused !important;
 }
 
 /* ── Catalogue sections ─────────────────────────────────────────────────── */
 /* Numbered and ruled: a mono index in the margin and a hairline to the edge. */
 .section {
-	padding: 4.5rem 0 1rem;
+	padding: 5rem 0 1rem;
 }
 
 .section-head {
 	display: flex;
 	align-items: baseline;
-	gap: 1rem;
-	margin-bottom: 2rem;
+	gap: var(--space-4);
+	margin-bottom: var(--space-6);
 	font-size: clamp(1.75rem, 4vw, 2.5rem);
 	font-weight: var(--display-weight);
 	letter-spacing: var(--display-tracking);
@@ -606,119 +1239,1055 @@ h1 {
 .section-head .index {
 	width: 2rem;
 	flex: none;
+	color: var(--accent);
 }
 
 .rule {
 	flex: 1;
 	height: 1px;
 	align-self: center;
-	background: var(--border-strong);
+	background: linear-gradient(90deg, var(--border-strong), transparent);
 }
 
-/* A printed index: numbers hang in the margin, hairlines separate entries. */
-.index-list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	counter-reset: entry;
-}
-
-.index-list li {
-	counter-increment: entry;
+/* ── What it does differently ───────────────────────────────────────────── */
+/* Three cards, each opened by a small scene of what it describes, with its
+   values set as a ledger in mono under the text. */
+.pillars {
 	display: grid;
-	grid-template-columns: 3rem minmax(0, 1fr) auto;
-	gap: 0 1rem;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--space-5);
+}
+
+.pillar {
+	display: flex;
+	flex-direction: column;
+	padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.pillar-label {
+	display: flex;
+	gap: 0.6rem;
 	align-items: baseline;
-	padding: 1.1rem 0;
+	margin: var(--space-5) 0 var(--space-3);
+	color: var(--accent);
+	font: 600 0.8125rem/1 var(--font-mono);
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+.pillar h3 {
+	font-size: 1.375rem;
+	line-height: 1.2;
+	font-weight: var(--display-weight);
+	letter-spacing: -0.02em;
+}
+
+.pillar > p:not(.pillar-label) {
+	color: var(--text-muted);
+	margin: var(--space-3) 0 1.25rem;
+}
+
+.pillar-facts {
+	margin: auto 0 0;
+}
+
+.pillar-facts div {
+	display: flex;
+	justify-content: space-between;
+	gap: var(--space-4);
+	padding: 0.45rem 0;
 	border-top: 1px solid var(--border-hairline);
-	transition: background-color var(--dur-hover) var(--ease-out);
+	font-size: 0.8125rem;
 }
 
-.index-list li:last-child {
-	border-bottom: 1px solid var(--border-hairline);
-}
-
-.index-list li::before {
-	content: counter(entry, decimal-leading-zero);
+.pillar-facts dt {
 	color: var(--text-faint);
-	font: 500 0.8125rem/1.6 var(--font-mono);
+}
+
+.pillar-facts dd {
+	margin: 0;
+	color: var(--text-default);
+	font-family: var(--font-mono);
+	font-variant-numeric: tabular-nums;
 	text-align: right;
-	padding-right: 0.5rem;
 }
 
-/* Hover tints the row rather than filling it. */
-.index-list li:hover {
-	background: linear-gradient(to right, transparent, color-mix(in srgb, var(--art) 8%, transparent) 20%, transparent);
+/* A card lifts as the app's does: 0.25rem, on the spring. */
+.pillar,
+.cell {
+	transition:
+		translate var(--dur-state) var(--ease-spring),
+		border-color var(--transition);
 }
 
-.index-list li:hover h3 {
+@media (hover: hover) {
+	.pillar:hover,
+	.cell:hover {
+		translate: 0 -0.25rem;
+		border-color: color-mix(in srgb, var(--accent) 38%, var(--glass-edge));
+	}
+}
+
+@media (max-width: 60rem) {
+	.pillars {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ── Vignettes ──────────────────────────────────────────────────────────── */
+/* A well at the head of a card, on the cover radius, holding a scene. */
+.vig {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 9.5rem;
+	margin: 0 calc(var(--space-2) * -1);
+	border-radius: var(--r-md);
+	border: 1px solid var(--border-hairline);
+	background: color-mix(in srgb, var(--bg-sunken) 55%, transparent);
+	overflow: hidden;
+	text-shadow: none;
+}
+
+/* Listen together: a session playing, three listeners, and their reactions
+   rising as they do in the app, 2400ms each and one every 1.2s. */
+.vig-together {
+	align-items: flex-end;
+	padding: var(--space-4);
+}
+
+.party {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	width: 100%;
+	padding: 0.6rem var(--space-3);
+	border-radius: var(--r-sm);
+	border: 1px solid var(--border-strong);
+	background: var(--control-face);
+}
+
+.party-line {
+	flex: 1;
+	height: 0.5rem;
+	border-radius: var(--r-pill);
+	background: color-mix(in srgb, var(--text-faint) 40%, transparent);
+}
+
+.faces {
+	display: flex;
+}
+
+.faces i {
+	width: 1.25rem;
+	height: 1.25rem;
+	margin-left: -0.35rem;
+	border-radius: 50%;
+	border: 2px solid var(--bg-surface);
+	background: hsl(calc(var(--art-h) + var(--turn)) 34% 62%);
+}
+
+.faces i:nth-child(1) { --turn: -35; }
+.faces i:nth-child(2) { --turn: 0; }
+.faces i:nth-child(3) { --turn: 40; }
+
+.reactions {
+	position: absolute;
+	inset: 0;
+}
+
+.reactions span {
+	position: absolute;
+	left: var(--x);
+	bottom: 2.6rem;
+	font-size: 1.5rem;
+	opacity: 0;
+	animation: react calc(var(--loop-rise) * 2.5) var(--ease-out) var(--wait) infinite;
+}
+
+.reactions span:nth-child(1) { --x: 18%; --wait: 0s; }
+.reactions span:nth-child(2) { --x: 62%; --wait: 1.2s; }
+.reactions span:nth-child(3) { --x: 38%; --wait: 2.4s; }
+.reactions span:nth-child(4) { --x: 78%; --wait: 3.6s; }
+.reactions span:nth-child(5) { --x: 50%; --wait: 4.8s; }
+
+@keyframes react {
+	0% {
+		opacity: 0;
+		translate: 0 0;
+		scale: 0.6;
+	}
+	6% {
+		opacity: 1;
+		scale: 1.1;
+	}
+	40%,
+	100% {
+		opacity: 0;
+		translate: 0 -6rem;
+		scale: 1;
+	}
+}
+
+/* Shared links: the token, drawn again as each link is made, and the three
+   lifetimes with a marker put down on the spring. */
+.vig-share {
+	flex-direction: column;
+	gap: var(--space-3);
+	padding: var(--space-4);
+}
+
+.link {
+	display: flex;
+	width: 100%;
+	padding: 0.55rem var(--space-3);
+	border-radius: var(--r-sm);
+	border: 1px solid var(--border-strong);
+	background: var(--control-face);
+	font: 500 0.75rem/1.5 var(--font-mono);
+	white-space: nowrap;
+	overflow: hidden;
+	-webkit-mask-image: linear-gradient(90deg, #000 70%, transparent);
+	mask-image: linear-gradient(90deg, #000 70%, transparent);
+}
+
+.link-path {
+	color: var(--text-faint);
+}
+
+.token {
 	color: var(--accent);
 }
 
-.index-list h3 {
+.expiry {
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	width: 100%;
+	padding: 3px;
+	border-radius: var(--r-pill);
+	border: 1px solid var(--border-strong);
+	font: 500 0.75rem/1 var(--font-mono);
+}
+
+.expiry span {
+	position: relative;
+	padding: 0.45rem 0;
+	text-align: center;
+	color: var(--text-muted);
+	transition: color var(--transition);
+}
+
+.expiry span.on {
+	color: var(--accent-contrast);
+}
+
+.expiry-mark {
+	position: absolute;
+	top: 3px;
+	bottom: 3px;
+	left: 3px;
+	width: calc((100% - 6px) / 3);
+	border-radius: var(--r-pill);
+	background: var(--accent);
+	translate: calc(var(--n, 1) * 100%) 0;
+	transition: translate var(--dur-travel) var(--ease-spring);
+}
+
+/* Security: what talks to what. A line in the accent crosses each wire at the
+   pace of the app's busy line; the dashed frame is your own network. */
+.vig-route {
+	gap: var(--space-2);
+	padding: var(--space-4) var(--space-3);
+	font: 500 0.6875rem/1 var(--font-mono);
+}
+
+.node {
+	flex: none;
+	padding: 0.45rem 0.5rem;
+	border-radius: var(--r-sm);
+	border: 1px solid var(--border-strong);
+	background: var(--control-face);
+	color: var(--text-muted);
+	white-space: nowrap;
+}
+
+.node--hh {
+	border-color: var(--accent);
+	color: var(--accent);
+}
+
+.wire {
+	flex: 1;
+	min-width: 0.75rem;
+	height: 2px;
+	border-radius: var(--r-pill);
+	background: var(--border-strong);
+	overflow: hidden;
+}
+
+.wire i {
+	display: block;
+	width: 40%;
+	height: 100%;
+	border-radius: inherit;
+	background: var(--accent);
+	animation: sweep var(--loop-sweep) var(--ease-sweep) infinite;
+}
+
+.zone .wire i {
+	animation-delay: calc(var(--loop-sweep) / 2);
+}
+
+@keyframes sweep {
+	from {
+		transform: translateX(-100%);
+	}
+	to {
+		transform: translateX(350%);
+	}
+}
+
+.zone {
+	position: relative;
+	flex: 3;
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	padding: 1.1rem 0.5rem;
+	border-radius: var(--r-md);
+	border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.zone::before {
+	content: 'your network';
+	position: absolute;
+	top: -0.45rem;
+	left: 0.6rem;
+	padding: 0 0.35rem;
+	background: var(--bg-surface);
+	color: var(--text-faint);
+	font-size: 0.625rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+}
+
+/* ── The player itself ──────────────────────────────────────────────────── */
+.bento {
+	display: grid;
+	grid-template-columns: repeat(12, minmax(0, 1fr));
+	gap: var(--space-5);
+	counter-reset: cell;
+}
+
+.cell {
+	counter-increment: cell;
+	grid-column: span 4;
+	padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.cell--5 {
+	grid-column: span 5;
+}
+
+.cell--7 {
+	grid-column: span 7;
+}
+
+.cell h3 {
+	margin-top: var(--space-5);
 	font-size: 1.125rem;
 	font-weight: 700;
 	letter-spacing: -0.01em;
-	transition: color var(--dur-hover) var(--ease-out);
+	line-height: 1.25;
 }
 
-.index-list p {
-	margin: 0.25rem 0 0;
-	max-width: 44rem;
+.cell h3::before {
+	content: counter(cell, decimal-leading-zero);
+	display: block;
+	margin-bottom: 0.6rem;
+	color: var(--accent);
+	font: 500 0.8125rem/1 var(--font-mono);
+	letter-spacing: 0.08em;
+}
+
+.cell > p {
+	margin: var(--space-2) 0 0;
 	color: var(--text-muted);
+	font-size: 0.9375rem;
+}
+
+@media (max-width: 60rem) {
+	.cell,
+	.cell--5,
+	.cell--7 {
+		grid-column: span 6;
+	}
 }
 
 @media (max-width: 40rem) {
-	.index-list li {
-		grid-template-columns: 2.25rem minmax(0, 1fr);
-	}
-
-	.index-list .chip {
-		grid-column: 2;
-		justify-self: start;
-		margin-top: 0.6rem;
+	.cell,
+	.cell--5,
+	.cell--7 {
+		grid-column: 1 / -1;
 	}
 }
 
-.shots {
+/* Original files: the badge changing with the format, over a seek bar. */
+.vig-quality {
+	flex-direction: column;
+	gap: var(--space-5);
+	padding: var(--space-5);
+}
+
+.vig-quality .badge {
+	font-size: 0.9375rem;
+	padding: 0.25rem 0.8rem;
+	transition:
+		background var(--dur-state) var(--ease-out),
+		border-color var(--dur-state) var(--ease-out),
+		color var(--dur-state) var(--ease-out);
+}
+
+.seek {
+	width: 100%;
+	height: 4px;
+	border-radius: var(--r-pill);
+	background: color-mix(in srgb, var(--text-faint) 35%, transparent);
+	overflow: hidden;
+}
+
+.seek i {
+	display: block;
+	height: 100%;
+	border-radius: inherit;
+	background: var(--accent);
+	transform-origin: left;
+	animation: seek calc(var(--loop-rise) * 4) linear infinite;
+}
+
+@keyframes seek {
+	from {
+		scale: 0 1;
+	}
+}
+
+/* Coloured by the artwork: seven squares on the cover radius, each a colour a
+   cover could give. Pressing one colours the room with it. */
+.vig-tint {
+	gap: clamp(0.4rem, 1.4vw, 0.85rem);
+	padding: var(--space-4);
+}
+
+.swatch {
+	flex: 1;
+	max-width: 4.25rem;
+	aspect-ratio: 1;
+	padding: 0;
+	border-radius: var(--r-md);
+	border: 1px solid var(--glass-edge);
+	background: linear-gradient(
+		140deg,
+		hsl(var(--h) 62% 62%),
+		hsl(calc(var(--h) + 28) 48% 34%)
+	);
+	box-shadow: var(--shadow-mid);
+	transition:
+		translate var(--dur-state) var(--ease-spring),
+		rotate var(--dur-state) var(--ease-spring),
+		box-shadow var(--transition);
+}
+
+.swatch:hover {
+	translate: 0 -0.25rem;
+	rotate: -4deg;
+}
+
+.swatch:nth-child(even):hover {
+	rotate: 4deg;
+}
+
+.swatch:active {
+	translate: 0 0;
+	scale: 0.97;
+	transition-duration: var(--dur-press);
+}
+
+.swatch[aria-pressed='true'] {
+	translate: 0 -0.25rem;
+	box-shadow:
+		0 0 0 2px var(--bg-surface),
+		0 0 0 4px var(--accent),
+		var(--shadow-mid);
+}
+
+/* Synced lyrics: the lines move up one at a time and the current one is lit. */
+.vig-lyrics {
+	align-items: stretch;
+	padding: 0 var(--space-5);
+}
+
+.lyrics-window {
+	width: 100%;
+	overflow: hidden;
+	-webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+	mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+}
+
+.lines {
+	--row: 1.5rem;
+	width: 100%;
+	margin: 0;
+	padding: calc(4.75rem - var(--row) / 2) 0 0;
+	list-style: none;
+	translate: 0 calc(var(--at, 2) * var(--row) * -1);
+	transition: translate var(--dur-travel) var(--ease-out);
+}
+
+.lines li {
+	display: flex;
+	align-items: center;
+	height: var(--row);
+}
+
+.lines li::before {
+	content: '';
+	width: var(--w);
+	height: 0.5rem;
+	border-radius: var(--r-pill);
+	background: color-mix(in srgb, var(--text-faint) 45%, transparent);
+	transform-origin: left;
+	transition:
+		background var(--dur-state) var(--ease-out),
+		scale var(--dur-state) var(--ease-spring);
+}
+
+.lines li.now::before {
+	background: var(--accent-strong);
+	scale: 1.06 1.3;
+}
+
+/* One app across your devices: what plays moves from one to the next. */
+.vig-devices {
+	align-items: flex-end;
+	gap: var(--space-4);
+	padding-bottom: 2rem;
+}
+
+.device {
+	position: relative;
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 1.5rem;
+	place-items: center;
+	border: 1.5px solid currentColor;
+	border-radius: var(--r-sm);
+	color: var(--border-strong);
+	animation: device-on calc(var(--loop-rise) * 3) var(--ease-colour) var(--turn) infinite;
+}
+
+.device .bars {
+	opacity: 0;
+	animation: device-bars calc(var(--loop-rise) * 3) var(--ease-colour) var(--turn) infinite;
+}
+
+.device--desk {
+	--turn: 0s;
+	width: 6rem;
+	height: 4rem;
+	margin-bottom: 0.6rem;
+}
+
+.device--desk::after {
+	content: '';
+	position: absolute;
+	top: calc(100% + 1.5px);
+	width: 2rem;
+	height: 0.5rem;
+	border: 1.5px solid currentColor;
+	border-top: 0;
+	border-radius: 0 0 4px 4px;
+}
+
+.device--tablet {
+	--turn: calc(var(--loop-rise) * -2);
+	width: 3.4rem;
+	height: 4.4rem;
+}
+
+.device--phone {
+	--turn: calc(var(--loop-rise) * -1);
+	width: 2rem;
+	height: 3.6rem;
+}
+
+@keyframes device-on {
+	0%,
+	36%,
+	100% {
+		color: var(--border-strong);
+	}
+	4%,
+	32% {
+		color: var(--accent);
+	}
+}
+
+@keyframes device-bars {
+	0%,
+	36%,
+	100% {
+		opacity: 0;
+	}
+	4%,
+	32% {
+		opacity: 1;
+	}
+}
+
+/* The equaliser: ten bands, each moved to its place on the spring, 24ms after
+   the one before. `site.js` gives each its --v between 0 and 1. */
+.vig-eq {
+	--travel: 5.5rem;
+	gap: clamp(0.5rem, 2vw, 1rem);
+	padding: var(--space-5) var(--space-4);
+}
+
+.vig-eq::before {
+	content: '';
+	position: absolute;
+	left: var(--space-4);
+	right: var(--space-4);
+	top: 50%;
+	height: 1px;
+	background: var(--border-strong);
+}
+
+.band {
+	position: relative;
+	width: 3px;
+	height: var(--travel);
+	border-radius: var(--r-pill);
+	background: color-mix(in srgb, var(--text-faint) 35%, transparent);
+}
+
+.band i {
+	position: absolute;
+	left: 50%;
+	bottom: 0;
+	width: 0.7rem;
+	height: 0.7rem;
+	margin: 0 0 -0.35rem -0.35rem;
+	border-radius: 50%;
+	background: var(--accent);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--bg-sunken) 80%, transparent);
+	translate: 0 calc(var(--v, 0.5) * var(--travel) * -1);
+	transition: translate var(--dur-travel) var(--ease-spring) calc(var(--n, 0) * 24ms);
+}
+
+/* Internet radio: rings leaving a point, 2400ms each, three in the air. */
+.vig-radio b {
+	position: relative;
+	width: 0.9rem;
+	height: 0.9rem;
+	border-radius: 50%;
+	background: var(--accent);
+}
+
+.vig-radio i {
+	position: absolute;
+	width: 11rem;
+	height: 11rem;
+	border-radius: 50%;
+	border: 1.5px solid var(--accent);
+	opacity: 0;
+	animation: ring var(--loop-rise) var(--ease-out) infinite;
+}
+
+.vig-radio i:nth-child(2) {
+	animation-delay: calc(var(--loop-rise) / 3);
+}
+
+.vig-radio i:nth-child(3) {
+	animation-delay: calc(var(--loop-rise) / 3 * 2);
+}
+
+@keyframes ring {
+	from {
+		opacity: 0.85;
+		scale: 0.08;
+	}
+	to {
+		opacity: 0;
+		scale: 1;
+	}
+}
+
+/* Your listening: the plays of each hour of the day, drawn up from the
+   baseline one after another, and the totals counted up over them. */
+.vig-hours {
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: flex-end;
+	gap: var(--space-3);
+	padding: var(--space-4);
+}
+
+.tally {
+	display: flex;
+	gap: var(--space-5);
+	margin: 0;
+	color: var(--text-muted);
+	font-size: 0.8125rem;
+}
+
+.tally b {
+	margin-right: 0.3rem;
+	color: var(--text-strong);
+	font: 700 1.375rem/1 var(--font-mono);
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.02em;
+}
+
+.hours {
+	display: flex;
+	align-items: flex-end;
+	gap: 2px;
+	height: 4.5rem;
+}
+
+.hours i {
+	flex: 1;
+	height: calc(var(--v) * 100%);
+	min-height: 2px;
+	border-radius: 2px 2px 0 0;
+	background: var(--accent-quiet);
+	transform-origin: bottom;
+	transition: scale var(--dur-state) var(--ease-out);
+}
+
+.hours i.peak {
+	background: var(--accent);
+}
+
+.js [data-live]:not(.live) .hours i {
+	scale: 1 0;
+	transition-duration: 0s;
+}
+
+.hours i:nth-child(n + 2) { transition-delay: 24ms; }
+.hours i:nth-child(n + 3) { transition-delay: 48ms; }
+.hours i:nth-child(n + 4) { transition-delay: 72ms; }
+.hours i:nth-child(n + 5) { transition-delay: 96ms; }
+.hours i:nth-child(n + 6) { transition-delay: 120ms; }
+.hours i:nth-child(n + 7) { transition-delay: 144ms; }
+.hours i:nth-child(n + 8) { transition-delay: 168ms; }
+.hours i:nth-child(n + 9) { transition-delay: 192ms; }
+.hours i:nth-child(n + 10) { transition-delay: 216ms; }
+.hours i:nth-child(n + 11) { transition-delay: 240ms; }
+.hours i:nth-child(n + 12) { transition-delay: 264ms; }
+.hours i:nth-child(n + 13) { transition-delay: 288ms; }
+.hours i:nth-child(n + 14) { transition-delay: 312ms; }
+.hours i:nth-child(n + 15) { transition-delay: 336ms; }
+.hours i:nth-child(n + 16) { transition-delay: 360ms; }
+.hours i:nth-child(n + 17) { transition-delay: 384ms; }
+.hours i:nth-child(n + 18) { transition-delay: 408ms; }
+.hours i:nth-child(n + 19) { transition-delay: 432ms; }
+.hours i:nth-child(n + 20) { transition-delay: 456ms; }
+.hours i:nth-child(n + 21) { transition-delay: 480ms; }
+.hours i:nth-child(n + 22) { transition-delay: 504ms; }
+.hours i:nth-child(n + 23) { transition-delay: 528ms; }
+.hours i:nth-child(n + 24) { transition-delay: 552ms; }
+
+/* The three music servers, each named in turn. */
+.vig-servers {
+	gap: var(--space-2);
+	padding: var(--space-3);
+	font: 500 0.75rem/1 var(--font-mono);
+}
+
+.vig-servers span {
+	padding: 0.5rem 0.6rem;
+	border-radius: var(--r-sm);
+	border: 1px solid currentColor;
+	color: var(--border-strong);
+	animation: device-on calc(var(--loop-rise) * 3) var(--ease-colour) infinite;
+}
+
+.vig-servers span:nth-child(2) {
+	animation-delay: calc(var(--loop-rise) * -2);
+}
+
+.vig-servers span:nth-child(3) {
+	animation-delay: calc(var(--loop-rise) * -1);
+}
+
+/* ── Screens ────────────────────────────────────────────────────────────── */
+/*
+ * Four captures in one frame. Without the script they are four figures down
+ * the page. With it they share one cell: the chosen one arrives as a cover
+ * does, the one left fades on the exit curve, and the marker behind the tabs
+ * is put down on the spring. A line fills along the top over six seconds and
+ * brings the next one, until a tab is chosen by hand; it waits while the
+ * pointer or the focus is in the frame.
+ */
+.viewer {
+	border-radius: var(--r-xl);
+	box-shadow:
+		inset 0 1px 0 var(--glass-sheen),
+		var(--float-shadow);
+}
+
+.viewer-top {
+	position: relative;
+	display: none;
+	padding: var(--space-2);
+	border-bottom: 1px solid var(--glass-edge);
+}
+
+.js .viewer-top {
+	display: block;
+}
+
+.tabs {
+	position: relative;
+	display: flex;
+	gap: var(--space-1);
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+	display: none;
+}
+
+.tab {
+	position: relative;
+	flex: none;
+	padding: 0.55rem 0.95rem;
+	border-radius: var(--r-pill);
+	color: var(--text-muted);
+	font-size: 0.875rem;
+	font-weight: 600;
+	white-space: nowrap;
+	transition:
+		color var(--transition),
+		text-shadow var(--transition);
+}
+
+.tab:hover {
+	color: var(--glow-color);
+	text-shadow: var(--glow-text);
+}
+
+.tab[aria-selected='true'] {
+	color: var(--text-strong);
+}
+
+.tab-mark {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: var(--w, 0);
+	border-radius: var(--r-pill);
+	border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+	background: color-mix(in srgb, var(--accent) 16%, transparent);
+	translate: var(--x, 0) 0;
+	transition:
+		translate var(--dur-travel) var(--ease-spring),
+		width var(--dur-travel) var(--ease-spring);
+}
+
+.viewer-timer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 2px;
+	overflow: hidden;
+}
+
+.viewer-timer i {
+	display: block;
+	height: 100%;
+	background: var(--accent);
+	transform-origin: left;
+	scale: 0 1;
+}
+
+.viewer.auto .viewer-timer i {
+	animation: timer 6s linear forwards;
+}
+
+.viewer.auto:hover .viewer-timer i,
+.viewer.auto:focus-within .viewer-timer i {
+	animation-play-state: paused;
+}
+
+@keyframes timer {
+	to {
+		scale: 1 1;
+	}
+}
+
+.slide {
+	margin: 0;
+}
+
+.slide img {
+	width: 100%;
+	aspect-ratio: 3 / 2;
+	object-fit: cover;
+}
+
+.slide figcaption,
+.shot figcaption {
+	display: flex;
+	gap: var(--space-3);
+	align-items: baseline;
+	color: var(--text-muted);
+	font-size: 0.9375rem;
+}
+
+.slide figcaption {
+	padding: var(--space-3) var(--space-5);
+	border-top: 1px solid var(--glass-edge);
+}
+
+.js .slides {
+	display: grid;
+}
+
+.js .slide {
+	grid-area: 1 / 1;
+	opacity: 0;
+	visibility: hidden;
+	transition:
+		opacity var(--dur-hover) var(--ease-exit),
+		visibility 0s linear var(--dur-hover);
+}
+
+.js .slide.on {
+	opacity: 1;
+	visibility: visible;
+	transition: none;
+}
+
+.js .slide.on img {
+	animation: cover-arrive var(--dur-travel) var(--ease-out) backwards;
+}
+
+.js .slide.on figcaption {
+	animation: sweep-caption var(--dur-state) var(--ease-out) 120ms backwards;
+}
+
+@keyframes sweep-caption {
+	from {
+		opacity: 0;
+		translate: -0.5rem 0;
+	}
+}
+
+/* ── Phones ─────────────────────────────────────────────────────────────── */
+/* The captures run to the screen's edges, so the corners of a phone's screen
+   are the frame. They stand turned a few degrees and straighten under the
+   pointer, and drift against each other as the page scrolls past. */
+.phones {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 16rem)) minmax(0, 1fr);
+	gap: var(--space-6);
+	align-items: center;
+	margin-top: var(--space-7);
 }
 
 .shot {
 	margin: 0;
 }
 
-.shot img {
-	border-radius: var(--r-lg);
+.shot figcaption {
+	margin-top: var(--space-3);
+}
+
+.phone img {
+	border-radius: var(--r-xl);
 	border: 1px solid var(--glass-edge);
 	box-shadow: var(--float-shadow);
+	rotate: var(--lean);
+	transition: rotate var(--dur-travel) var(--ease-spring);
 }
 
-.shot--wide {
-	grid-column: 1 / -1;
+.phone:nth-child(1) {
+	--lean: -3deg;
+	--drift: 2.5rem;
 }
 
-.shot figcaption {
-	display: flex;
-	gap: 0.75rem;
-	align-items: baseline;
-	margin-top: 0.75rem;
-	color: var(--text-muted);
-	font-size: 0.9375rem;
+.phone:nth-child(2) {
+	--lean: 3deg;
+	--drift: -2.5rem;
 }
 
-@media (max-width: 44rem) {
-	.shots {
-		grid-template-columns: 1fr;
+@media (hover: hover) {
+	.phone:hover img {
+		rotate: 0deg;
 	}
 }
 
+@supports (animation-timeline: view()) {
+	.phone {
+		animation: drift linear both;
+		animation-timeline: view();
+	}
+
+	@keyframes drift {
+		from {
+			translate: 0 var(--drift);
+		}
+		to {
+			translate: 0 calc(var(--drift) * -1);
+		}
+	}
+}
+
+.phones-text {
+	max-width: 24rem;
+	padding-left: var(--space-4);
+}
+
+.phones-text h3 {
+	font-size: 1.375rem;
+	font-weight: var(--display-weight);
+	letter-spacing: -0.02em;
+}
+
+.phones-text p {
+	color: var(--text-muted);
+}
+
+@media (max-width: 52rem) {
+	.phones {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--space-5);
+	}
+
+	.phones-text {
+		grid-column: 1 / -1;
+		grid-row: 1;
+		padding-left: 0;
+	}
+}
+
+.credits {
+	max-width: 48rem;
+	margin: var(--space-7) 0 0;
+	color: var(--text-faint);
+	font-size: 0.8125rem;
+}
+
+/* ── Install ────────────────────────────────────────────────────────────── */
 .install {
 	display: grid;
 	grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-	gap: 2rem;
+	gap: var(--space-6);
 	align-items: start;
 }
 
@@ -729,7 +2298,19 @@ h1 {
 }
 
 .terminal {
-	overflow: hidden;
+	position: sticky;
+	top: 6rem;
+	border-radius: var(--r-xl);
+	box-shadow:
+		inset 0 1px 0 var(--glass-sheen),
+		var(--float-shadow);
+}
+
+@media (max-width: 60rem) {
+	.terminal {
+		position: relative;
+		top: 0;
+	}
 }
 
 .terminal-top {
@@ -751,18 +2332,72 @@ h1 {
 	margin: 0;
 	padding: 1.1rem 1.25rem 1.3rem;
 	overflow-x: auto;
+	scrollbar-width: none;
 	line-height: 1.8;
 	color: var(--text-strong);
 }
 
+.terminal pre::-webkit-scrollbar {
+	display: none;
+}
+
+/*
+ * The commands typed out when the terminal comes into view. `site.js` splits
+ * them into lines, each holding what has been typed and what has not; the
+ * second half is hidden and keeps its place, so nothing moves as it fills.
+ */
+.line {
+	display: block;
+}
+
+.typed::before {
+	content: '$ ';
+	color: var(--accent);
+}
+
+.typed:empty::before {
+	visibility: hidden;
+}
+
+.line .rest {
+	visibility: hidden;
+}
+
+.line.typing .typed::after {
+	content: '';
+	display: inline-block;
+	width: 0.55em;
+	height: 1.1em;
+	margin-left: 1px;
+	vertical-align: text-bottom;
+	background: var(--accent);
+	animation: caret 0.9s steps(1) infinite;
+}
+
+.line.typing .rest {
+	margin-left: calc(-0.55em - 1px);
+}
+
+@keyframes caret {
+	50% {
+		opacity: 0;
+	}
+}
+
+.copy.done {
+	color: var(--accent);
+	border-color: var(--accent);
+}
+
 .facts {
+	--step: 24ms;
 	margin: 0;
 }
 
 .facts div {
 	display: grid;
 	grid-template-columns: 6.5rem minmax(0, 1fr);
-	gap: 1rem;
+	gap: var(--space-4);
 	padding: 0.8rem 0;
 	border-top: 1px solid var(--border-hairline);
 }
@@ -777,6 +2412,11 @@ h1 {
 	font: 500 0.75rem/1.9 var(--font-mono);
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
+	transition: color var(--transition);
+}
+
+.facts div:hover dt {
+	color: var(--accent);
 }
 
 .facts dd {
@@ -794,24 +2434,40 @@ h1 {
 	margin-top: 0.6rem;
 }
 
-/* The way a book's index is set: dotted leaders to the description. */
+/* ── Documentation ──────────────────────────────────────────────────────── */
+/* The way a book's index is set: dotted leaders to the description. Under the
+   pointer the leader is drawn over in the accent, from the title outward. */
 .docs {
+	--step: 24ms;
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
+.docs li {
+	border-top: 1px solid var(--border-hairline);
+}
+
+.docs li:last-child {
+	border-bottom: 1px solid var(--border-hairline);
+}
+
 .docs a {
 	display: flex;
 	align-items: baseline;
-	gap: 0.75rem;
-	padding: 0.8rem 0;
+	gap: var(--space-3);
+	padding: 0.9rem 0;
 	color: var(--text-strong);
 	font-weight: 700;
 	text-decoration: none;
+	transition:
+		color var(--transition),
+		text-shadow var(--transition),
+		padding var(--dur-state) var(--ease-spring);
 }
 
 .docs a:hover {
+	padding-left: var(--space-3);
 	color: var(--accent);
 }
 
@@ -823,10 +2479,28 @@ h1 {
 }
 
 .leader {
+	position: relative;
 	flex: 1;
 	min-width: 2rem;
 	border-bottom: 1px dotted var(--border-strong);
 	transform: translateY(-0.3em);
+}
+
+.leader::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -1px;
+	height: 1px;
+	background: var(--accent);
+	transform-origin: left;
+	scale: 0 1;
+	transition: scale var(--dur-travel) var(--ease-out);
+}
+
+.docs a:hover .leader::after {
+	scale: 1 1;
 }
 
 @media (max-width: 40rem) {
@@ -844,24 +2518,40 @@ h1 {
 	}
 }
 
+/* ── Foot ───────────────────────────────────────────────────────────────── */
 .foot {
 	margin-top: 5rem;
-	padding-top: 2rem;
 	padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
-	border-top: 1px solid var(--border-hairline);
 	color: var(--text-faint);
 	font-size: 0.875rem;
 }
 
 .foot p {
 	max-width: 44rem;
-	margin: 0 0 1rem;
+	margin: 0 0 var(--space-4);
+}
+
+/* The name once more, at poster scale, filled with the room's colour from the
+   top and open at the foot. */
+.foot .wordmark {
+	max-width: none;
+	margin: 0 0 var(--space-5);
+	padding-bottom: 0.08em;
+	border-bottom: 1px solid var(--border-hairline);
+	font: var(--display-weight) clamp(3.5rem, 17.5vw, 13.5rem) / 0.9 var(--font-display);
+	letter-spacing: var(--display-tracking);
+	text-shadow: none;
+	color: transparent;
+	background: linear-gradient(to bottom, color-mix(in srgb, var(--accent) 70%, transparent), transparent 92%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	user-select: none;
 }
 
 .foot-links {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 1.5rem;
+	gap: var(--space-5);
 }
 
 /* ── Degradation ────────────────────────────────────────────────────────── */
@@ -869,15 +2559,28 @@ h1 {
 	.glass {
 		background-color: var(--bg-surface);
 	}
+
+	.key {
+		background: var(--bg-raised);
+	}
+
+	.key--primary {
+		background: var(--accent);
+	}
 }
 
 @media (prefers-reduced-transparency: reduce) {
 	.glass,
+	.pane,
 	.key {
 		background-color: var(--bg-surface);
 		background-image: none;
 		-webkit-backdrop-filter: none;
 		backdrop-filter: none;
+	}
+
+	.key {
+		background-color: var(--bg-raised);
 	}
 
 	.key--primary {
@@ -889,149 +2592,36 @@ h1 {
 	}
 }
 
+/* Less motion: everything is in place at once and stays there. The loops rest
+   on their last frame, and what follows the scroll does not. */
 @media (prefers-reduced-motion: reduce) {
 	:root {
 		transition: none;
 	}
 
-	html {
-		scroll-behavior: auto;
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-delay: 0s !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		transition-delay: 0s !important;
+		scroll-behavior: auto !important;
 	}
 
-	.sleeve-turn,
-	.key {
-		transition: none;
-	}
-}
-
-/* ── What it does differently ───────────────────────────────────────────── */
-/* Three columns, each opened by a rule in the room's colour, with its values
-   set as a small ledger in mono under the text. */
-.pillars {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 2rem;
-}
-
-.pillar {
-	display: flex;
-	flex-direction: column;
-	padding-top: 1.25rem;
-	border-top: 2px solid var(--accent);
-}
-
-.pillar-label {
-	display: flex;
-	gap: 0.6rem;
-	align-items: baseline;
-	margin: 0 0 0.75rem;
-	color: var(--accent);
-	font: 600 0.8125rem/1 var(--font-mono);
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-}
-
-.pillar h3 {
-	font-size: 1.375rem;
-	line-height: 1.2;
-	font-weight: var(--display-weight);
-	letter-spacing: -0.02em;
-}
-
-.pillar p {
-	color: var(--text-muted);
-	margin: 0.75rem 0 1.25rem;
-}
-
-.pillar .route {
-	margin: 1rem 0 0;
-	color: var(--text-muted);
-	font-size: 0.8125rem;
-	overflow-x: auto;
-}
-
-.pillar .route b {
-	color: var(--accent);
-}
-
-.pillar-facts {
-	margin: auto 0 0;
-}
-
-.pillar-facts div {
-	display: flex;
-	justify-content: space-between;
-	gap: 1rem;
-	padding: 0.45rem 0;
-	border-top: 1px solid var(--border-hairline);
-	font-size: 0.8125rem;
-}
-
-.pillar-facts dt {
-	color: var(--text-faint);
-}
-
-.pillar-facts dd {
-	margin: 0;
-	color: var(--text-default);
-	font-family: var(--font-mono);
-	font-variant-numeric: tabular-nums;
-	text-align: right;
-}
-
-@media (max-width: 56rem) {
-	.pillars {
-		grid-template-columns: 1fr;
-		gap: 2.5rem;
-	}
-}
-
-/* ── Phones ─────────────────────────────────────────────────────────────── */
-/* The captures run to the screen's edges, so the corners of a phone's screen
-   are the frame. */
-.phones {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 16rem)) minmax(0, 1fr);
-	gap: 1.5rem;
-	align-items: end;
-	margin-top: 2.5rem;
-}
-
-.phone img {
-	border-radius: 2rem;
-}
-
-.phones-text {
-	align-self: center;
-	max-width: 24rem;
-	padding-left: 1rem;
-}
-
-.phones-text h3 {
-	font-size: 1.375rem;
-	font-weight: var(--display-weight);
-	letter-spacing: -0.02em;
-}
-
-.phones-text p {
-	color: var(--text-muted);
-}
-
-@media (max-width: 52rem) {
-	.phones {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+	.stage,
+	.phone,
+	.ticker-run.loop,
+	.aurora::before {
+		animation: none !important;
 	}
 
-	.phones-text {
-		grid-column: 1 / -1;
-		grid-row: 1;
-		padding-left: 0;
+	.sleeve-turn {
+		transform: none;
 	}
-}
 
-.credits {
-	max-width: 48rem;
-	margin: 2.5rem 0 0;
-	color: var(--text-faint);
-	font-size: 0.8125rem;
+	.js [data-live]:not(.live) .hours i {
+		scale: 1 1;
+	}
 }
