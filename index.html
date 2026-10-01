@@ -99,15 +99,12 @@
 					<figure class="sleeve" data-tint>
 						<div class="sleeve-turn">
 							<div class="plate">
-								<img
-									src="assets/shots/album.jpg"
-									width="1800"
-									height="1200"
-									alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right, both tinted gold by the cover"
-								/>
+								<img data-for="dark" src="assets/shots/album.jpg" width="1800" height="1200" alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right, both tinted gold by the cover" loading="lazy" />
+								<img data-for="light" src="assets/shots/album-light.jpg" width="1800" height="1200" alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right, both tinted gold by the cover" loading="lazy" />
 								<span class="sheen" aria-hidden="true"></span>
 							</div>
-							<img class="pocket" src="assets/shots/phone-player.jpg" width="786" height="1704" alt="" aria-hidden="true" />
+							<img class="pocket" data-for="dark" src="assets/shots/phone-player.jpg" width="786" height="1704" alt="" aria-hidden="true" loading="lazy" />
+							<img class="pocket" data-for="light" src="assets/shots/phone-player-light.jpg" width="786" height="1704" alt="" aria-hidden="true" loading="lazy" />
 						</div>
 					</figure>
 				</div>
@@ -247,7 +244,7 @@
 					<article class="cell cell--4 pane" data-reveal="rise" data-live>
 						<!-- The figures and the shape of the chart are those of the Your listening screenshot below. -->
 						<div class="vig vig-hours" aria-hidden="true" data-hours>
-							<p class="tally"><span><b data-count="568">568</b> plays</span><span><b data-count="34">34</b> hours</span></p>
+							<p class="tally"><span><b data-count="566">566</b> plays</span><span><b data-count="34">34</b> hours</span></p>
 							<div class="hours">
 								<i style="--v: 0.2"></i><i style="--v: 0.02"></i><i style="--v: 0.02"></i><i style="--v: 0.02"></i><i style="--v: 0.02"></i><i style="--v: 0.02"></i><i style="--v: 0.08"></i><i style="--v: 0.22"></i><i style="--v: 0.5"></i><i style="--v: 0.43"></i><i style="--v: 0.6"></i><i style="--v: 0.04"></i><i style="--v: 0.18"></i><i style="--v: 0.36"></i><i style="--v: 0.08"></i><i style="--v: 0.03"></i><i style="--v: 0.29"></i><i style="--v: 0.33"></i><i style="--v: 0.63"></i><i style="--v: 0.69"></i><i style="--v: 0.77"></i><i style="--v: 0.57"></i><i class="peak" style="--v: 1"></i><i style="--v: 0.33"></i>
 							</div>
@@ -278,30 +275,36 @@
 					</div>
 					<div class="slides">
 						<figure class="slide on" id="slide-lyrics" role="tabpanel" aria-labelledby="tab-lyrics">
-							<img src="assets/shots/lyrics.jpg" width="1800" height="1200" loading="lazy" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" />
+							<img data-for="dark" src="assets/shots/lyrics.jpg" width="1800" height="1200" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" loading="lazy" />
+							<img data-for="light" src="assets/shots/lyrics-light.jpg" width="1800" height="1200" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" loading="lazy" />
 							<figcaption><span class="index">a</span>Synced lyrics, in place of the artwork</figcaption>
 						</figure>
 						<figure class="slide" id="slide-more" role="tabpanel" aria-labelledby="tab-more">
-							<img src="assets/shots/recommendations.jpg" width="1800" height="1200" loading="lazy" alt="An album page scrolled to more albums from the same artist" />
+							<img data-for="dark" src="assets/shots/recommendations.jpg" width="1800" height="1200" alt="An album page scrolled to more albums from the same artist" loading="lazy" />
+							<img data-for="light" src="assets/shots/recommendations-light.jpg" width="1800" height="1200" alt="An album page scrolled to more albums from the same artist" loading="lazy" />
 							<figcaption><span class="index">b</span>More from the artist, under the track list</figcaption>
 						</figure>
 						<figure class="slide" id="slide-listening" role="tabpanel" aria-labelledby="tab-listening">
-							<img src="assets/shots/listening.jpg" width="1800" height="1200" loading="lazy" alt="Your listening over the last 30 days: 568 plays, 34 hours, a chart of plays by the hour of the day and one by the day of the week, and the top artists and albums" />
+							<img data-for="dark" src="assets/shots/listening.jpg" width="1800" height="1200" alt="Your listening over the last 30 days: 566 plays, 34 hours, a chart of plays by the hour of the day and one by the day of the week, and the top artists and albums" loading="lazy" />
+							<img data-for="light" src="assets/shots/listening-light.jpg" width="1800" height="1200" alt="Your listening over the last 30 days: 566 plays, 34 hours, a chart of plays by the hour of the day and one by the day of the week, and the top artists and albums" loading="lazy" />
 							<figcaption><span class="index">c</span>Your listening: the history summed up, by 30 days, 90 days, the year or everything kept</figcaption>
 						</figure>
 						<figure class="slide" id="slide-share" role="tabpanel" aria-labelledby="tab-share">
-							<img src="assets/shots/share.jpg" width="1800" height="1125" loading="lazy" alt="A shared song, playing in the browser without an account" />
+							<img data-for="dark" src="assets/shots/share.jpg" width="1800" height="1125" alt="A shared song, playing in the browser without an account" loading="lazy" />
+							<img data-for="light" src="assets/shots/share-light.jpg" width="1800" height="1125" alt="A shared song, playing in the browser without an account" loading="lazy" />
 							<figcaption><span class="index">d</span>A shared song, for anyone with the link</figcaption>
 						</figure>
 					</div>
 				</div>
 				<div class="phones">
 					<figure class="shot phone" data-tint data-reveal="arrive">
-						<img src="assets/shots/phone-album.jpg" width="786" height="1704" loading="lazy" alt="An album page on a phone, with what is playing and four tabs in one panel at the foot of the screen" />
+						<img data-for="dark" src="assets/shots/phone-album.jpg" width="786" height="1704" alt="An album page on a phone, with what is playing and four tabs in one panel at the foot of the screen" loading="lazy" />
+						<img data-for="light" src="assets/shots/phone-album-light.jpg" width="786" height="1704" alt="An album page on a phone, with what is playing and four tabs in one panel at the foot of the screen" loading="lazy" />
 						<figcaption><span class="index">e</span>The player and the tabs, one panel</figcaption>
 					</figure>
 					<figure class="shot phone" data-tint data-reveal="arrive">
-						<img src="assets/shots/phone-player.jpg" width="786" height="1704" loading="lazy" alt="The full player on a phone, with the cover filling the top of the screen" />
+						<img data-for="dark" src="assets/shots/phone-player.jpg" width="786" height="1704" alt="The full player on a phone, with the cover filling the top of the screen" loading="lazy" />
+						<img data-for="light" src="assets/shots/phone-player-light.jpg" width="786" height="1704" alt="The full player on a phone, with the cover filling the top of the screen" loading="lazy" />
 						<figcaption><span class="index">f</span>Pulled up from it, and down to close</figcaption>
 					</figure>
 					<div class="phones-text" data-reveal="rise">

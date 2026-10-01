@@ -33,7 +33,7 @@ or follows the scroll.
 | `style.css` | Tokens from the app's `app.css`, and the page's layout |
 | `site.js` | Artwork tint, theme switch, sleeve tilt, what arrives on scroll, the scenes in the cards, the screens, the terminal, copy button |
 | `assets/fonts/` | Manrope and JetBrains Mono (latin subset, variable), SIL OFL 1.1 |
-| `assets/shots/` | Screenshots, made by `screenshots/run.sh` |
+| `assets/shots/` | Screenshots in Liquid and in Paper (`-light`), made by `screenshots/run.sh` |
 | `screenshots/` | The scripts that make them |
 | `CNAME` | The custom domain for GitHub Pages |
 
@@ -50,7 +50,9 @@ HEDDOHON_IMAGE=ghcr.io/zorcerer/heddohon:dev screenshots/run.sh
 It downloads a library into the Docker volume `hh-shots-library` (3.8 GB, kept
 for the next run), starts a Navidrome and a Heddohon on a network of their own,
 scans the library, and captures five desktop pages at 1440x960 and two phone
-pages at 393x852 with Playwright. The plays behind `listening.jpg` are mock:
+pages at 393x852 with Playwright. Each is taken twice: `name.jpg` in Liquid and
+`name-light.jpg` in Paper, the same page a second later with the theme changed.
+The site shows the one that matches its own theme. The plays behind `listening.jpg` are mock:
 `capture.mjs` writes about 2,700 of them, spread over 150 days, into
 Heddohon's database. The servers, their data and the network are
 removed at the end. Each shot names its album and track in `capture.mjs`;

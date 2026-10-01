@@ -18,7 +18,7 @@ PLAYWRIGHT_IMAGE=mcr.microsoft.com/playwright:v1.63.0-noble
 P=hh-shots
 
 cleanup() {
-	docker rm -f $P-navidrome $P-heddohon $P-capture >/dev/null 2>&1 || true
+	docker rm -f $P-navidrome $P-heddohon $P-capture $P-fetch >/dev/null 2>&1 || true
 	docker volume rm $P-navidrome $P-data >/dev/null 2>&1 || true
 	docker network rm $P >/dev/null 2>&1 || true
 }
@@ -30,7 +30,7 @@ docker pull -q "$NAVIDROME_IMAGE" >/dev/null
 
 echo '== library'
 docker volume create $P-library >/dev/null
-docker run --rm -i -v $P-library:/music alpine:3 sh -c 'cat > /tmp/library.sh && sh /tmp/library.sh' < library.sh
+docker run --rm -i --name $P-fetch -v $P-library:/music alpine:3 sh -c 'cat > /tmp/library.sh && sh /tmp/library.sh' < library.sh
 
 echo '== servers'
 docker network create $P >/dev/null

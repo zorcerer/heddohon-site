@@ -314,6 +314,14 @@ img {
 	height: auto;
 }
 
+/* Each capture is on the page twice, taken in Liquid and in Paper, and the
+   theme shows its own. Both are lazy, so the other is not fetched until the
+   theme is switched. */
+[data-theme='dark'] img[data-for='light'],
+[data-theme='light'] img[data-for='dark'] {
+	display: none;
+}
+
 h1,
 h2,
 h3 {

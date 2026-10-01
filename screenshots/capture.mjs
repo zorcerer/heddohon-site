@@ -91,6 +91,13 @@ async function signedIn(options) {
 		maxRedirects: 0
 	});
 	if (response.status() !== 303) throw new Error(`sign-in: HTTP ${response.status()}`);
+	// From 0.5 a card offers the desktop app once something has played. It is
+	// put away on the account, as its "Not now" does, so it is in no capture.
+	// An earlier release has no such setting; the answer is not read.
+	await context.request.patch(`${APP}/api/settings`, {
+		data: { installCardDismissed: true },
+		headers: { origin: APP }
+	});
 	return context;
 }
 
@@ -189,6 +196,12 @@ await seedPlays(wake);
 
 let current;
 
+/**
+ * Two files a shot: `name.jpg` in Liquid, as the app is served, and
+ * `name-light.jpg` in Paper. The theme is CSS under `data-theme` on the root,
+ * so the second is the same page a second later with the attribute changed,
+ * not a second visit: the track, the scroll and what is open are the first's.
+ */
 async function shoot(page, name) {
 	// The player holds a connection open, so the network never goes idle; wait
 	// for the covers on screen instead (the ones below are lazy and never load).
@@ -201,7 +214,13 @@ async function shoot(page, name) {
 	// The room's colour eases over 900ms after a track or a page changes.
 	await page.waitForTimeout(1600);
 	await page.screenshot({ path: `${OUT}/${name}.jpg`, type: 'jpeg', quality: 86 });
-	console.log(`${name}.jpg`);
+	await page.evaluate(() => (document.documentElement.dataset.theme = 'light'));
+	// Controls ease to the new theme's colours over 220ms.
+	await page.waitForTimeout(1000);
+	await page.screenshot({ path: `${OUT}/${name}-light.jpg`, type: 'jpeg', quality: 86 });
+	await page.evaluate(() => (document.documentElement.dataset.theme = 'dark'));
+	await page.waitForTimeout(400);
+	console.log(`${name}.jpg, ${name}-light.jpg`);
 }
 
 /**

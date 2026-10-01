@@ -86,7 +86,11 @@ const colours = new Map();
 const swatches = [...document.querySelectorAll('.swatch')];
 const ratios = new Map();
 const figures = [...document.querySelectorAll('[data-tint]')];
-const imageOf = (figure) => figure.querySelector('.slide.on img') ?? figure.querySelector('img');
+// Each capture has an image for either theme; the one shown is the one sampled.
+const imageOf = (figure) => {
+	const scope = figure.querySelector('.slide.on') ?? figure;
+	return scope.querySelector(`img[data-for="${root.dataset.theme}"]`) ?? scope.querySelector('img');
+};
 
 function whenLoaded(img) {
 	return img.complete && img.naturalWidth ? Promise.resolve() : new Promise((r) => img.addEventListener('load', r, { once: true }));
@@ -141,6 +145,21 @@ const themeColour = document.querySelector('meta[name="theme-color"]');
 function applyTheme(theme) {
 	root.dataset.theme = theme;
 	themeColour?.setAttribute('content', GROUND[theme]);
+	// The captures change with the theme, and the room takes the new one's colour.
+	pick();
+}
+
+/*
+ * The captures of the theme about to be shown are lazy and not displayed, so
+ * not yet fetched. Those within a screen of the window are fetched as the
+ * switch is pressed, which gives them the length of the veil to arrive.
+ */
+function warm(theme) {
+	for (const img of document.querySelectorAll(`img[data-for="${theme}"]`)) {
+		if (img.closest('.slide:not(.on)')) continue;
+		const box = img.parentElement.getBoundingClientRect();
+		if (box.bottom > -innerHeight && box.top < innerHeight * 2) img.loading = 'eager';
+	}
 }
 applyTheme(root.dataset.theme);
 
@@ -158,6 +177,7 @@ document.querySelector('.theme')?.addEventListener('click', (event) => {
 	try {
 		localStorage.setItem('hh-theme', next);
 	} catch {}
+	warm(next);
 	if (!veil?.animate || reducedMotion.matches) return applyTheme(next);
 
 	const box = event.currentTarget.getBoundingClientRect();
