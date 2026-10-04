@@ -414,12 +414,20 @@ h3 {
  * everything, fading out over the travel length. It rests at 0 and is animated
  * from 1, so a browser that never runs the animation is not left behind it.
  */
+/*
+ * Its ground is an image layer, not a background colour. Safari 26 paints the
+ * strip under the status bar and the band behind its toolbar from the
+ * background colour of a fixed element at that edge, and reads it from one
+ * that is at opacity 0: this layer, left on the page after its 480ms, gave
+ * both a flat ground in place of the room. The application does the same with
+ * its full-screen layers.
+ */
 .arrival {
 	position: fixed;
 	inset: 0;
 	z-index: 60;
 	pointer-events: none;
-	background: var(--bg-base);
+	background: linear-gradient(var(--bg-base), var(--bg-base));
 	opacity: 0;
 	animation: arrive var(--dur-travel) var(--ease-out) forwards;
 }
