@@ -2076,6 +2076,159 @@ h1 span {
 	animation-delay: calc(var(--loop-rise) * -1);
 }
 
+/* A play posted to a Discord channel: the message as the channel shows it,
+   under the webhook's name, with the cover that was uploaded with it. It
+   arrives as a list row does, stays for three rises and leaves. */
+.vig-post {
+	justify-content: flex-start;
+	padding: var(--space-4);
+}
+
+.post {
+	width: 100%;
+	animation: post-in calc(var(--loop-rise) * 3) var(--ease-out) infinite;
+}
+
+.post-who {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+	margin: 0 0 0.45rem;
+	color: var(--text-strong);
+	font: 700 0.8125rem/1 var(--font-ui);
+}
+
+.post-who i {
+	width: 1.1rem;
+	height: 1.1rem;
+	border-radius: 50%;
+	background: var(--accent);
+}
+
+.post-who b {
+	padding: 0.15rem 0.3rem;
+	border-radius: 0.25rem;
+	background: var(--accent-quiet);
+	color: var(--text-strong);
+	font: 600 0.5625rem/1 var(--font-mono);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.embed {
+	position: relative;
+	display: grid;
+	gap: 0.3rem;
+	max-width: 24rem;
+	padding: 0.65rem calc(3.75rem + var(--space-4) + var(--space-3)) 0.65rem var(--space-4);
+	border-radius: var(--r-sm);
+	border: 1px solid var(--border-strong);
+	border-left: 3px solid var(--accent);
+	background: var(--control-face);
+}
+
+.embed p {
+	margin: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.embed-title {
+	color: var(--text-strong);
+	font: 700 0.875rem/1.2 var(--font-ui);
+}
+
+.embed-lines {
+	color: var(--text-muted);
+	font: 500 0.75rem/1.45 var(--font-ui);
+}
+
+.embed-foot {
+	color: var(--text-faint);
+	font: 500 0.625rem/1 var(--font-mono);
+	letter-spacing: 0.04em;
+}
+
+/* The cover out of the Album screenshot, which holds it at 298 of its 1800
+   pixels, 136 from the left and 88 from the top. */
+.embed-cover {
+	position: absolute;
+	top: 0.65rem;
+	right: var(--space-3);
+	width: 3.75rem;
+	aspect-ratio: 1;
+	border-radius: var(--r-sm);
+	background: var(--bg-sunken) url('assets/shots/album.jpg') 9.05% 9.76% / 604% auto no-repeat;
+}
+
+@keyframes post-in {
+	0%,
+	4% {
+		opacity: 0;
+		translate: 0 0.5rem;
+	}
+
+	14%,
+	90% {
+		opacity: 1;
+		translate: 0 0;
+	}
+
+	100% {
+		opacity: 0;
+		translate: 0 0;
+	}
+}
+
+/* Every cover cached ahead: the squares of a library filling in one after
+   another, over the bar the fill reports its progress on. */
+.vig-covers {
+	flex-direction: column;
+	gap: var(--space-4);
+	padding: var(--space-4) var(--space-5);
+}
+
+.vig-covers .seek {
+	flex: none;
+}
+
+.tiles {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	gap: 0.4rem;
+	width: 100%;
+}
+
+/*
+ * How many squares are lit, counted up over the same 9600ms as the bar and
+ * read by each square against its own place. A registered number, so it can
+ * be animated; its resting value is all fourteen, which is what a page
+ * without motion shows.
+ */
+@property --filled {
+	syntax: '<number>';
+	inherits: true;
+	initial-value: 14;
+}
+
+.tiles {
+	animation: fill calc(var(--loop-rise) * 4) linear infinite;
+}
+
+.tiles i {
+	aspect-ratio: 1;
+	border-radius: 0.3rem;
+	background: var(--accent);
+	opacity: clamp(0.16, calc((var(--filled) - var(--n)) * 0.85), 0.85);
+}
+
+@keyframes fill {
+	from {
+		--filled: 0;
+	}
+}
+
 /* ── Screens ────────────────────────────────────────────────────────────── */
 /*
  * Four captures in one frame. Without the script they are four figures down
