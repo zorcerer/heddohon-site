@@ -94,8 +94,11 @@ async function signedIn(options) {
 	// From 0.5 a card offers the desktop app once something has played. It is
 	// put away on the account, as its "Not now" does, so it is in no capture.
 	// An earlier release has no such setting; the answer is not read.
+	//
+	// The aurora is asked for by name, so the captures show it whichever way
+	// the release in the image has it by default.
 	await context.request.patch(`${APP}/api/settings`, {
-		data: { installCardDismissed: true },
+		data: { installCardDismissed: true, aurora: 'moving' },
 		headers: { origin: APP }
 	});
 	return context;
