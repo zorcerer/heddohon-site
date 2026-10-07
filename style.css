@@ -2237,6 +2237,172 @@ h1 span {
 	}
 }
 
+/* Listening now: the last cell, the width of the grid at every size. After
+   the rules above that set a cell's span, so it holds on a narrow screen. */
+.cell--12 {
+	grid-column: 1 / -1;
+}
+
+/* A reading measure: across the whole grid a line ran to about 150 characters. */
+.cell--12 > p {
+	max-width: 72ch;
+}
+
+/*
+ * Three listeners as the app's popup lists them, each picture in a ring that
+ * fills as the track plays, and the pill of pictures the popup opens from,
+ * with the app's playing bars. A ring runs its stretch of the track in five
+ * rise loops and starts it again; the pictures in the pill arrive one after
+ * another on the spring. Every loop rests on a frame that shows the scene
+ * whole, which is where reduced motion leaves it.
+ */
+.vig-heard {
+	gap: var(--space-3);
+	padding: var(--space-4);
+}
+
+.heard {
+	flex: 1 1 0;
+	min-width: 0;
+	max-width: 17rem;
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	padding: 0.6rem var(--space-3);
+	border-radius: var(--r-sm);
+	border: 1px solid var(--border-strong);
+	background: var(--control-face);
+}
+
+.heard-who {
+	position: relative;
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: 2.75rem;
+	height: 2.75rem;
+}
+
+.heard-who svg {
+	position: absolute;
+	inset: 0;
+	rotate: -90deg;
+	fill: none;
+	stroke: var(--border-strong);
+	stroke-width: 2;
+}
+
+.heard-who .played {
+	stroke: var(--accent);
+	stroke-linecap: round;
+	stroke-dasharray: 1;
+	stroke-dashoffset: var(--to);
+	animation: heard-ring calc(var(--loop-rise) * 5) linear infinite;
+}
+
+@keyframes heard-ring {
+	from {
+		stroke-dashoffset: var(--from);
+	}
+}
+
+/* The picture: a disc of the room's colour turned a little, as the faces of
+   listening together are, with the listener's initial. */
+.heard-who b {
+	display: grid;
+	place-items: center;
+	width: 2.1rem;
+	height: 2.1rem;
+	border-radius: 50%;
+	background: hsl(calc(var(--art-h) + var(--turn)) 34% 62%);
+	color: #14161a;
+	font: 700 0.875rem/1 var(--font-display);
+}
+
+.heard-text {
+	display: grid;
+	min-width: 0;
+	gap: 0.1rem;
+}
+
+.heard-text > * {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.heard-text b {
+	color: var(--text-strong);
+	font: 700 0.8125rem/1.25 var(--font-ui);
+}
+
+.heard-text span {
+	color: var(--text-default);
+	font: 500 0.75rem/1.3 var(--font-ui);
+}
+
+.heard-text i {
+	color: var(--text-muted);
+	font: 500 0.6875rem/1.3 var(--font-ui);
+	font-style: normal;
+}
+
+.heads-pill {
+	flex: none;
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	margin-left: auto;
+	padding: 0.45rem 0.6rem 0.45rem 0.9rem;
+	border-radius: var(--r-pill);
+	border: 1px solid var(--glass-edge);
+	background: var(--control-face);
+}
+
+.heads-pill .faces i {
+	width: 1.5rem;
+	height: 1.5rem;
+	animation: heard-head calc(var(--loop-rise) * 3) var(--ease-spring) var(--wait) infinite;
+}
+
+.heads-pill .faces i:nth-child(1) {
+	margin-left: 0;
+	--wait: 0s;
+}
+
+.heads-pill .faces i:nth-child(2) {
+	--wait: 0.3s;
+}
+
+.heads-pill .faces i:nth-child(3) {
+	--wait: 0.6s;
+}
+
+@keyframes heard-head {
+	0% {
+		scale: 0.4;
+		opacity: 0;
+	}
+	7%,
+	100% {
+		scale: 1;
+		opacity: 1;
+	}
+}
+
+/* Narrower, the list gives up its last listener, then its second. */
+@media (max-width: 60rem) {
+	.heard:nth-of-type(3) {
+		display: none;
+	}
+}
+
+@media (max-width: 40rem) {
+	.heard:nth-of-type(2) {
+		display: none;
+	}
+}
+
 /* ── Screens ────────────────────────────────────────────────────────────── */
 /*
  * Four captures in one frame. Without the script they are four figures down
