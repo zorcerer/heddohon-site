@@ -25,7 +25,8 @@ cleanup() {
 trap cleanup EXIT
 cleanup
 
-docker pull -q "$HEDDOHON_IMAGE" >/dev/null
+# An image built on this machine is in no registry; it is used as it is.
+docker pull -q "$HEDDOHON_IMAGE" >/dev/null 2>&1 || docker image inspect "$HEDDOHON_IMAGE" >/dev/null
 docker pull -q "$NAVIDROME_IMAGE" >/dev/null
 
 echo '== library'

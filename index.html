@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="terminal">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -8,11 +8,11 @@
 			name="description"
 			content="Heddohon is a web music player you host yourself, for Navidrome, Subsonic and Jellyfin. Original files up to FLAC 24/192, synced lyrics, shared links and listening together."
 		/>
-		<meta name="theme-color" content="#0b0c0f" />
+		<meta name="theme-color" content="#08090a" />
 		<link rel="canonical" href="https://heddohon.app/" />
 		<link rel="icon" href="assets/favicon.svg" />
 		<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
-		<link rel="preload" href="assets/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href="assets/fonts/jetbrains-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
 
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content="https://heddohon.app/" />
@@ -21,13 +21,27 @@
 		<meta property="og:image" content="https://heddohon.app/assets/social-preview.png" />
 		<meta name="twitter:card" content="summary_large_image" />
 
-		<!-- The saved theme is applied before the first paint, so Paper does not
-		     arrive as a flash of Liquid. `js` hides what `site.js` brings in on
-		     scroll; it is taken off again after 3 seconds if that script never
-		     ran, so the page is not left with parts of it hidden. -->
+		<!-- The page is Terminal unless another theme was chosen here before. That
+		     one is applied before the first paint, so Paper does not arrive as a
+		     flash of Terminal. Liquid is stored as `liquid`: `dark`, which a visit
+		     before Terminal existed may have stored, is not a choice of it. `js`
+		     hides what `site.js` brings in on scroll; it is taken off again after
+		     3 seconds if that script never ran, so the page is not left with
+		     parts of it hidden. -->
 		<script>
 			try {
-				if (localStorage.getItem('hh-theme') === 'light') document.documentElement.dataset.theme = 'light';
+				var saved = localStorage.getItem('hh-theme');
+				if (saved === 'light' || saved === 'liquid') {
+					document.documentElement.dataset.theme = saved === 'light' ? 'light' : 'dark';
+					// Those two are set in Manrope; the mono above is Terminal's face and every theme's figures.
+					var face = document.createElement('link');
+					face.rel = 'preload';
+					face.as = 'font';
+					face.type = 'font/woff2';
+					face.crossOrigin = '';
+					face.href = 'assets/fonts/manrope-latin-wght-normal.woff2';
+					document.head.appendChild(face);
+				}
 			} catch {}
 			document.documentElement.classList.add('js');
 			setTimeout(function () {
@@ -59,7 +73,8 @@
 				<a href="#install">Install</a>
 				<a href="#docs">Docs</a>
 			</nav>
-			<button class="key theme" type="button" aria-label="Switch theme" title="Switch between Liquid and Paper">
+			<button class="key theme" type="button" aria-label="Switch theme" title="Switch between Terminal, Liquid and Paper">
+				<span class="theme-name" data-for="terminal">Terminal</span>
 				<span class="theme-name" data-for="dark">Liquid</span>
 				<span class="theme-name" data-for="light">Paper</span>
 			</button>
@@ -99,12 +114,14 @@
 					<figure class="sleeve" data-tint>
 						<div class="sleeve-turn">
 							<div class="plate">
-								<img data-for="dark" src="assets/shots/album.jpg" width="1800" height="1200" alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right, both tinted gold by the cover" loading="lazy" />
-								<img data-for="light" src="assets/shots/album-light.jpg" width="1800" height="1200" alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right, both tinted gold by the cover" loading="lazy" />
+								<img data-for="terminal" src="assets/shots/album.jpg" width="1800" height="1200" alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right" loading="lazy" />
+								<img data-for="dark" src="assets/shots/album-liquid.jpg" width="1800" height="1200" alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right, both tinted gold by the cover" loading="lazy" />
+								<img data-for="light" src="assets/shots/album-paper.jpg" width="1800" height="1200" alt="Heddohon on an album page of Bach played by Kimiko Ishizaka, 24-bit FLAC, with the now-playing panel on the right, both tinted gold by the cover" loading="lazy" />
 								<span class="sheen" aria-hidden="true"></span>
 							</div>
-							<img class="pocket" data-for="dark" src="assets/shots/phone-player.jpg" width="786" height="1704" alt="" aria-hidden="true" loading="lazy" />
-							<img class="pocket" data-for="light" src="assets/shots/phone-player-light.jpg" width="786" height="1704" alt="" aria-hidden="true" loading="lazy" />
+							<img class="pocket" data-for="terminal" src="assets/shots/phone-player.jpg" width="786" height="1704" alt="" aria-hidden="true" loading="lazy" />
+							<img class="pocket" data-for="dark" src="assets/shots/phone-player-liquid.jpg" width="786" height="1704" alt="" aria-hidden="true" loading="lazy" />
+							<img class="pocket" data-for="light" src="assets/shots/phone-player-paper.jpg" width="786" height="1704" alt="" aria-hidden="true" loading="lazy" />
 						</div>
 					</figure>
 				</div>
@@ -207,8 +224,8 @@
 							<button class="swatch" type="button" aria-pressed="false" aria-label="Violet" data-h="276" data-s="34" data-l="56" style="--h: 276"></button>
 							<button class="swatch" type="button" aria-pressed="false" aria-label="Rose" data-h="338" data-s="38" data-l="54" style="--h: 338"></button>
 						</div>
-						<h3>Coloured by the artwork</h3>
-						<p>The interface takes its colour from the cover that is playing, in Liquid (dark glass) or Paper (parchment and ink). This page does the same with its screenshots. Press a square above to colour it by hand; the theme switch is in the top bar.</p>
+						<h3>Three themes, coloured by the artwork</h3>
+						<p>Terminal is flat panes on hairlines, a mono face and a dot grid. Liquid is dark glass, and Paper is parchment and ink. In each, the accent is the colour of the cover that is playing; Terminal can hold one colour of your own instead. This page does the same with its screenshots. Press a square above to colour it by hand; the theme switch is in the top bar.</p>
 					</article>
 					<article class="cell cell--4 pane" data-reveal="rise" data-live>
 						<div class="vig vig-lyrics" aria-hidden="true">
@@ -322,36 +339,42 @@
 					</div>
 					<div class="slides">
 						<figure class="slide on" id="slide-lyrics" role="tabpanel" aria-labelledby="tab-lyrics">
-							<img data-for="dark" src="assets/shots/lyrics.jpg" width="1800" height="1200" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" loading="lazy" />
-							<img data-for="light" src="assets/shots/lyrics-light.jpg" width="1800" height="1200" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" loading="lazy" />
+							<img data-for="terminal" src="assets/shots/lyrics.jpg" width="1800" height="1200" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" loading="lazy" />
+							<img data-for="dark" src="assets/shots/lyrics-liquid.jpg" width="1800" height="1200" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" loading="lazy" />
+							<img data-for="light" src="assets/shots/lyrics-paper.jpg" width="1800" height="1200" alt="Synced lyrics from LRCLIB in the now-playing panel, the current line highlighted, above the track details" loading="lazy" />
 							<figcaption><span class="index">a</span>Synced lyrics, in place of the artwork</figcaption>
 						</figure>
 						<figure class="slide" id="slide-more" role="tabpanel" aria-labelledby="tab-more">
-							<img data-for="dark" src="assets/shots/recommendations.jpg" width="1800" height="1200" alt="An album page scrolled to more albums from the same artist" loading="lazy" />
-							<img data-for="light" src="assets/shots/recommendations-light.jpg" width="1800" height="1200" alt="An album page scrolled to more albums from the same artist" loading="lazy" />
+							<img data-for="terminal" src="assets/shots/recommendations.jpg" width="1800" height="1200" alt="An album page scrolled to more albums from the same artist" loading="lazy" />
+							<img data-for="dark" src="assets/shots/recommendations-liquid.jpg" width="1800" height="1200" alt="An album page scrolled to more albums from the same artist" loading="lazy" />
+							<img data-for="light" src="assets/shots/recommendations-paper.jpg" width="1800" height="1200" alt="An album page scrolled to more albums from the same artist" loading="lazy" />
 							<figcaption><span class="index">b</span>More from the artist, under the track list</figcaption>
 						</figure>
 						<figure class="slide" id="slide-listening" role="tabpanel" aria-labelledby="tab-listening">
-							<img data-for="dark" src="assets/shots/listening.jpg" width="1800" height="1200" alt="Your listening over the last 30 days: 581 plays, 36 hours, a chart of plays by the hour of the day and one by the day of the week, and the top artists and albums" loading="lazy" />
-							<img data-for="light" src="assets/shots/listening-light.jpg" width="1800" height="1200" alt="Your listening over the last 30 days: 581 plays, 36 hours, a chart of plays by the hour of the day and one by the day of the week, and the top artists and albums" loading="lazy" />
+							<img data-for="terminal" src="assets/shots/listening.jpg" width="1800" height="1200" alt="Your listening over the last 30 days: 581 plays, 36 hours, a chart of plays by the hour of the day and one by the day of the week, and the top artists and albums" loading="lazy" />
+							<img data-for="dark" src="assets/shots/listening-liquid.jpg" width="1800" height="1200" alt="Your listening over the last 30 days: 581 plays, 36 hours, a chart of plays by the hour of the day and one by the day of the week, and the top artists and albums" loading="lazy" />
+							<img data-for="light" src="assets/shots/listening-paper.jpg" width="1800" height="1200" alt="Your listening over the last 30 days: 581 plays, 36 hours, a chart of plays by the hour of the day and one by the day of the week, and the top artists and albums" loading="lazy" />
 							<figcaption><span class="index">c</span>Your listening: the history summed up, by 30 days, 90 days, the year or everything kept</figcaption>
 						</figure>
 						<figure class="slide" id="slide-share" role="tabpanel" aria-labelledby="tab-share">
-							<img data-for="dark" src="assets/shots/share.jpg" width="1800" height="1125" alt="A shared song, playing in the browser without an account" loading="lazy" />
-							<img data-for="light" src="assets/shots/share-light.jpg" width="1800" height="1125" alt="A shared song, playing in the browser without an account" loading="lazy" />
+							<img data-for="terminal" src="assets/shots/share.jpg" width="1800" height="1125" alt="A shared song, playing in the browser without an account" loading="lazy" />
+							<img data-for="dark" src="assets/shots/share-liquid.jpg" width="1800" height="1125" alt="A shared song, playing in the browser without an account" loading="lazy" />
+							<img data-for="light" src="assets/shots/share-paper.jpg" width="1800" height="1125" alt="A shared song, playing in the browser without an account" loading="lazy" />
 							<figcaption><span class="index">d</span>A shared song, for anyone with the link</figcaption>
 						</figure>
 					</div>
 				</div>
 				<div class="phones">
 					<figure class="shot phone" data-tint data-reveal="arrive">
-						<img data-for="dark" src="assets/shots/phone-album.jpg" width="786" height="1704" alt="An album page on a phone, with what is playing and four tabs in one panel at the foot of the screen" loading="lazy" />
-						<img data-for="light" src="assets/shots/phone-album-light.jpg" width="786" height="1704" alt="An album page on a phone, with what is playing and four tabs in one panel at the foot of the screen" loading="lazy" />
+						<img data-for="terminal" src="assets/shots/phone-album.jpg" width="786" height="1704" alt="An album page on a phone, with what is playing and four tabs in one panel at the foot of the screen" loading="lazy" />
+						<img data-for="dark" src="assets/shots/phone-album-liquid.jpg" width="786" height="1704" alt="An album page on a phone, with what is playing and four tabs in one panel at the foot of the screen" loading="lazy" />
+						<img data-for="light" src="assets/shots/phone-album-paper.jpg" width="786" height="1704" alt="An album page on a phone, with what is playing and four tabs in one panel at the foot of the screen" loading="lazy" />
 						<figcaption><span class="index">e</span>The player and the tabs, one panel</figcaption>
 					</figure>
 					<figure class="shot phone" data-tint data-reveal="arrive">
-						<img data-for="dark" src="assets/shots/phone-player.jpg" width="786" height="1704" alt="The full player on a phone, with the cover filling the top of the screen" loading="lazy" />
-						<img data-for="light" src="assets/shots/phone-player-light.jpg" width="786" height="1704" alt="The full player on a phone, with the cover filling the top of the screen" loading="lazy" />
+						<img data-for="terminal" src="assets/shots/phone-player.jpg" width="786" height="1704" alt="The full player on a phone, with the cover filling the top of the screen" loading="lazy" />
+						<img data-for="dark" src="assets/shots/phone-player-liquid.jpg" width="786" height="1704" alt="The full player on a phone, with the cover filling the top of the screen" loading="lazy" />
+						<img data-for="light" src="assets/shots/phone-player-paper.jpg" width="786" height="1704" alt="The full player on a phone, with the cover filling the top of the screen" loading="lazy" />
 						<figcaption><span class="index">f</span>Pulled up from it, and down to close</figcaption>
 					</figure>
 					<div class="phones-text" data-reveal="rise">

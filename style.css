@@ -314,9 +314,9 @@ img {
 	height: auto;
 }
 
-/* Each capture is on the page twice, taken in Liquid and in Paper, and the
-   theme shows its own. Both are lazy, so the other is not fetched until the
-   theme is switched. */
+/* Each capture is on the page once for each theme, and the theme shows its
+   own. All are lazy, so another theme's are not fetched until the theme is
+   switched. Terminal's part of this is with its other rules, below. */
 [data-theme='dark'] img[data-for='light'],
 [data-theme='light'] img[data-for='dark'] {
 	display: none;
@@ -2934,6 +2934,278 @@ h1 span {
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--space-5);
+}
+
+/* ── Terminal ───────────────────────────────────────────────────────────── */
+/*
+ * The app's third theme and its default, and so this page's. Its rules are in
+ * `src/lib/styles/terminal.css` in zorcerer/heddohon, and the values below are
+ * copied from there under the same names: flat panes on hairlines over a
+ * ground of #08090a, JetBrains Mono, a dot grid behind the page, one 6px
+ * radius, no blur and no shadow. The accent is still the artwork's hue, here
+ * the screenshot nearest the middle of the window; the room is not lit by it.
+ *
+ * Tokens are on `:root[data-theme='terminal']`, two selectors deep, so they
+ * win over `:root` above. Everything else is under `[data-theme='terminal']`
+ * and leaves Liquid and Paper as they were.
+ */
+
+/*
+ * JetBrains Mono at 92 percent of its size, under a name of its own. A mono
+ * face is about a fifth wider than Manrope at the same size, and every size
+ * on this page was chosen for Manrope; `size-adjust` scales the glyphs inside
+ * the face and leaves those figures alone. The file is the one above, so it
+ * is fetched once. Safari before 17 ignores `size-adjust`.
+ */
+@font-face {
+	font-family: 'Heddohon Terminal';
+	font-style: normal;
+	font-display: swap;
+	font-weight: 100 800;
+	size-adjust: 92%;
+	src: url('assets/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+:root[data-theme='terminal'] {
+	--font-display: 'Heddohon Terminal', 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
+	--font-ui: 'Heddohon Terminal', 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
+	--display-weight: 700;
+	--display-tracking: -0.02em;
+
+	--r-xl: 0.375rem;
+	--r-lg: 0.375rem;
+	--r-md: 0.375rem;
+	--r-sm: 0.25rem;
+	--r-pill: 0.1875rem;
+
+	--bg-base: #08090a;
+	--bg-sunken: #060708;
+	--bg-surface: #0d0e10;
+	--bg-raised: #14161a;
+	--bg-hover: #1b1e22;
+
+	--text-strong: #e6e8ea;
+	--text-default: #b9bdc2;
+	--text-muted: #8a9097;
+	--text-faint: #7c828a;
+
+	--border-hairline: #1d2024;
+	--border-strong: #2a2e33;
+
+	--accent: hsl(var(--art-h) min(calc(var(--art-s) + 14%), 52%) 70%);
+	--accent-strong: hsl(var(--art-h) min(calc(var(--art-s) + 18%), 56%) 80%);
+	--accent-quiet: hsl(var(--art-h) min(calc(var(--art-s) + 6%), 44%) 30%);
+	--accent-contrast: #0a0b0c;
+
+	/* Nothing casts a shadow. Written as shadows of no size, since the tokens
+	   are used inside shadow lists. */
+	--shadow-mid: 0 0 0 0 transparent;
+	--float-shadow: 0 0 0 0 transparent;
+
+	/* The glass tokens, set to what an opaque pane is. */
+	--glass-base: 100%;
+	--glass-tint: 0%;
+	--glass-blur: none;
+	--pane-base: 100%;
+	--control-face: transparent;
+	--control-blur: none;
+	--text-muted-through: var(--text-muted);
+	--text-faint-through: var(--text-faint);
+	--glass-edge: var(--border-strong);
+	--glass-sheen: transparent;
+
+	--text-shade: none;
+	--glow-color: var(--text-strong);
+	--glow-text: none;
+	--ambience-strength: 0%;
+	--aurora-strength: 0;
+
+	/* Hover answers in 90ms, and nothing overshoots. */
+	--dur-hover: 90ms;
+	--ease-spring: var(--ease-out);
+
+	/* The dot grid: a 1px dot every 14px, in the text colour at 7 percent. */
+	--dots: radial-gradient(circle, color-mix(in srgb, var(--text-strong) 7%, transparent) 1px, transparent 1.6px);
+	--dots-size: 14px 14px;
+
+	color-scheme: dark;
+}
+
+/* Each capture is on the page three times, and the theme shows its own. */
+[data-theme='terminal'] img[data-for]:not([data-for='terminal']),
+[data-theme='dark'] img[data-for='terminal'],
+[data-theme='light'] img[data-for='terminal'] {
+	display: none;
+}
+
+[data-theme='terminal'] .theme-name[data-for='terminal'] {
+	display: inline-block;
+	animation: badge-swap var(--dur-state) var(--ease-out);
+}
+
+/* The room: the ground and the dot grid. The artwork's pools are not drawn. */
+[data-theme='terminal'] .room {
+	background:
+		var(--dots) 0 0 / var(--dots-size),
+		linear-gradient(var(--bg-base), var(--bg-base));
+}
+
+[data-theme='terminal'] .aurora {
+	display: none;
+}
+
+[data-theme='terminal'] ::selection {
+	background: var(--accent);
+	color: var(--accent-contrast);
+}
+
+/* A pane: opaque, one step above the ground, with a hairline. The bar carries
+   the dot grid, as the rail and the player do in the app. */
+[data-theme='terminal'] .glass,
+[data-theme='terminal'] .pane {
+	background-color: var(--bg-surface);
+	background-image: none;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+	box-shadow: none;
+}
+
+[data-theme='terminal'] .bar {
+	background-image: var(--dots);
+	background-size: var(--dots-size);
+}
+
+[data-theme='terminal'] .float {
+	box-shadow: none;
+}
+
+/* Under the pointer a pane takes the accent on its hairline, where the other
+   themes pool the room's colour under it. */
+[data-theme='terminal'] .pane {
+	transition: border-color var(--transition);
+}
+
+[data-theme='terminal'] .pane::before {
+	display: none;
+}
+
+@media (hover: hover) {
+	[data-theme='terminal'] .pane:hover {
+		border-color: color-mix(in srgb, var(--accent) 60%, var(--border-strong));
+	}
+}
+
+/*
+ * A key is its label between brackets, in lower case, with no face and no
+ * edge, as a button is in the app. The brackets have an empty alternative
+ * text, so they are drawn and not read as part of the name; the first
+ * declaration is for Safari before 17.4. The closing one is the `::after`
+ * that draws the press in the other themes: here a press changes the ground
+ * under the label.
+ */
+[data-theme='terminal'] .key {
+	gap: 0.4rem;
+	padding: 0 0.25rem;
+	border: 0;
+	background: none;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+	box-shadow: none;
+	color: var(--text-strong);
+	font-weight: 500;
+	text-transform: lowercase;
+}
+
+[data-theme='terminal'] .key::before,
+[data-theme='terminal'] .key::after {
+	position: static;
+	inset: auto;
+	background: none;
+	color: var(--text-faint);
+	transition: color var(--transition);
+}
+
+[data-theme='terminal'] .key::before {
+	content: '[';
+	content: '[' / '';
+}
+
+[data-theme='terminal'] .key::after {
+	content: ']';
+	content: ']' / '';
+}
+
+[data-theme='terminal'] .key:hover,
+[data-theme='terminal'] .key:focus-visible {
+	color: var(--accent);
+	box-shadow: none;
+}
+
+[data-theme='terminal'] .key:hover::before,
+[data-theme='terminal'] .key:hover::after {
+	color: var(--accent);
+}
+
+[data-theme='terminal'] .key:active {
+	background: var(--bg-hover);
+}
+
+[data-theme='terminal'] .key.pressed {
+	animation: none;
+}
+
+[data-theme='terminal'] .key > *,
+[data-theme='terminal'] .key:active > * {
+	scale: none;
+	transition: none;
+}
+
+/* The one filled key: the accent, with its label in the dark tone. */
+[data-theme='terminal'] .key--primary {
+	padding: 0 1.1rem;
+	background: var(--accent);
+	color: var(--accent-contrast);
+	font-weight: 700;
+}
+
+[data-theme='terminal'] .key--primary::before,
+[data-theme='terminal'] .key--primary::after {
+	content: none;
+}
+
+[data-theme='terminal'] .key--primary:hover,
+[data-theme='terminal'] .key--primary:focus-visible,
+[data-theme='terminal'] .key--primary:active {
+	background: var(--accent-strong);
+	color: var(--accent-contrast);
+}
+
+/* A key that is a glyph alone (the link to the source) has no brackets. */
+[data-theme='terminal'] .key:has(> svg:only-child) {
+	padding: 0 0.6rem;
+	color: var(--text-muted);
+}
+
+[data-theme='terminal'] .key:has(> svg:only-child)::before,
+[data-theme='terminal'] .key:has(> svg:only-child)::after {
+	content: none;
+}
+
+/* The section showing, in the bar: the accent, where the other themes light
+   the word. */
+[data-theme='terminal'] .bar nav a.here {
+	color: var(--accent);
+}
+
+/* The crest stays level under the pointer. */
+[data-theme='terminal'] .brand:hover .crest {
+	rotate: none;
+}
+
+/* The bars move in three hard steps. */
+[data-theme='terminal'] .bars i {
+	border-radius: 0;
+	animation-timing-function: steps(3, jump-none);
 }
 
 /* ── Degradation ────────────────────────────────────────────────────────── */

@@ -10,13 +10,15 @@ static file server, for example `docker run --rm -p 8080:80 -v "$PWD":/usr/share
 It follows the application's [design notes](https://github.com/zorcerer/heddohon/wiki/Design-notes):
 a colourless ground, and every hue taken from artwork. `site.js` samples the
 screenshot nearest the middle of the viewport and writes `--art-h/s/l` on the
-root, so the page changes colour as it scrolls. The top bar switches between
-Liquid and Paper, stored in `localStorage`.
+root, so the page changes colour as it scrolls. The page opens in Terminal, the
+application's default theme, and the top bar switches to Liquid and to Paper;
+the choice is stored in `localStorage`.
 
 The radii (`--r-sm` to `--r-xl`), the typefaces and the motion tokens
 (`--dur-press` 120ms, `--dur-hover` 220ms, `--dur-state` 340ms, `--dur-travel`
 480ms, `--dur-colour` 900ms, and the out, exit and spring curves) are copied
-from the application's `src/lib/styles/app.css`, and so are the animations
+from the application's `src/lib/styles/app.css`, with Terminal's own values
+(6px corners, `--dur-hover` 90ms, the dot grid) from `terminal.css`, and so are the animations
 built on them: the heading sweep, the list rise, the press ripple, the playing
 bars, the badge swap, the reactions and the aurora. A change to those in the
 application is copied here by hand.
@@ -30,10 +32,10 @@ or follows the scroll.
 | Path | Contents |
 | --- | --- |
 | `index.html` | The page |
-| `style.css` | Tokens from the app's `app.css`, and the page's layout |
+| `style.css` | Tokens from the app's `app.css` and `terminal.css`, and the page's layout |
 | `site.js` | Artwork tint, theme switch, sleeve tilt, what arrives on scroll, the scenes in the cards, the screens, the terminal, copy button |
 | `assets/fonts/` | Manrope and JetBrains Mono (latin subset, variable), SIL OFL 1.1 |
-| `assets/shots/` | Screenshots in Liquid and in Paper (`-light`), made by `screenshots/run.sh` |
+| `assets/shots/` | Screenshots in Terminal, in Liquid (`-liquid`) and in Paper (`-paper`), made by `screenshots/run.sh` |
 | `screenshots/` | The scripts that make them |
 | `CNAME` | The custom domain for GitHub Pages |
 
@@ -45,13 +47,15 @@ and nothing else:
 ```sh
 screenshots/run.sh                                           # the latest release
 HEDDOHON_IMAGE=ghcr.io/zorcerer/heddohon:dev screenshots/run.sh
+HEDDOHON_IMAGE=heddohon:local screenshots/run.sh              # an image built on this machine
 ```
 
 It downloads a library into the Docker volume `hh-shots-library` (3.8 GB, kept
 for the next run), starts a Navidrome and a Heddohon on a network of their own,
 scans the library, and captures five desktop pages at 1440x960 and two phone
-pages at 393x852 with Playwright. Each is taken twice: `name.jpg` in Liquid and
-`name-light.jpg` in Paper, the same page a second later with the theme changed.
+pages at 393x852 with Playwright. Each is taken three times: `name.jpg` in Terminal,
+`name-liquid.jpg` in Liquid and `name-paper.jpg` in Paper, the same page a
+second later with the theme changed.
 The site shows the one that matches its own theme. The plays behind `listening.jpg` are mock:
 `capture.mjs` writes about 2,700 of them, spread over 150 days, into
 Heddohon's database. The servers, their data and the network are

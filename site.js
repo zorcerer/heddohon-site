@@ -86,7 +86,7 @@ const colours = new Map();
 const swatches = [...document.querySelectorAll('.swatch')];
 const ratios = new Map();
 const figures = [...document.querySelectorAll('[data-tint]')];
-// Each capture has an image for either theme; the one shown is the one sampled.
+// Each capture has an image for each theme; the one shown is the one sampled.
 const imageOf = (figure) => {
 	const scope = figure.querySelector('.slide.on') ?? figure;
 	return scope.querySelector(`img[data-for="${root.dataset.theme}"]`) ?? scope.querySelector('img');
@@ -140,7 +140,12 @@ for (const swatch of swatches) {
 }
 
 /* ── Theme ─────────────────────────────────────────────────────────────── */
-const GROUND = { light: '#f0e7d5', dark: '#0b0c0f' };
+const GROUND = { terminal: '#08090a', dark: '#0b0c0f', light: '#f0e7d5' };
+// The switch goes round the three, from whichever is showing.
+const NEXT = { terminal: 'dark', dark: 'light', light: 'terminal' };
+// What is kept for a theme. Liquid is kept as `liquid`: a visit before Terminal
+// existed may have kept `dark`, which the page does not take as a choice of it.
+const KEPT = { terminal: 'terminal', dark: 'liquid', light: 'light' };
 const themeColour = document.querySelector('meta[name="theme-color"]');
 function applyTheme(theme) {
 	root.dataset.theme = theme;
@@ -164,6 +169,25 @@ function warm(theme) {
 applyTheme(root.dataset.theme);
 
 /*
+ * Each theme is set in its own face: Terminal in the mono, Liquid and Paper
+ * in Manrope. The page has fetched the one it opened in. The other is
+ * fetched once the page has loaded, so a switch draws the new theme in its
+ * own face from its first frame, and not in the system's until the file
+ * arrives.
+ */
+const FACE = {
+	terminal: "600 1em 'Heddohon Terminal'",
+	dark: "600 1em 'Manrope Variable'",
+	light: "600 1em 'Manrope Variable'"
+};
+const fetchFace = (theme) => document.fonts?.load(FACE[theme]).catch(() => {}) ?? Promise.resolve();
+/* A switch pressed before that waits for the face, for 300ms at most. */
+const faceSoon = (theme) => Promise.race([fetchFace(theme), new Promise((done) => setTimeout(done, 300))]);
+const otherFaces = () => Object.keys(FACE).forEach(fetchFace);
+if (document.readyState === 'complete') otherFaces();
+else addEventListener('load', otherFaces, { once: true });
+
+/*
  * The page in the new theme is uncovered from the switch outward, behind a
  * soft edge, over the length of a colour change (`.turning` in the
  * stylesheet). It is a view transition: the browser holds a picture of the
@@ -184,11 +208,12 @@ const veil = document.querySelector('.veil');
 let turning = false;
 document.querySelector('.theme')?.addEventListener('click', (event) => {
 	if (turning) return;
-	const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+	const next = NEXT[root.dataset.theme] ?? 'terminal';
 	try {
-		localStorage.setItem('hh-theme', next);
+		localStorage.setItem('hh-theme', KEPT[next]);
 	} catch {}
 	warm(next);
+	fetchFace(next);
 	if (reducedMotion.matches) return applyTheme(next);
 
 	turning = true;
@@ -207,7 +232,13 @@ document.querySelector('.theme')?.addEventListener('click', (event) => {
 		root.style.setProperty('--turn-edge', `${EDGE}px`);
 		root.style.setProperty('--turn-reach', `${Math.ceil(reach + EDGE)}px`);
 		root.classList.add('turning');
-		document.startViewTransition(() => applyTheme(next)).finished.then(done, done);
+		// The picture of the new page is taken when this settles, so in its face.
+		document
+			.startViewTransition(() => {
+				applyTheme(next);
+				return faceSoon(next);
+			})
+			.finished.then(done, done);
 		return;
 	}
 

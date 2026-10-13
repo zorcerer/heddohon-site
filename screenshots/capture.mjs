@@ -200,10 +200,14 @@ await seedPlays(wake);
 let current;
 
 /**
- * Two files a shot: `name.jpg` in Liquid, as the app is served, and
- * `name-light.jpg` in Paper. The theme is CSS under `data-theme` on the root,
- * so the second is the same page a second later with the attribute changed,
- * not a second visit: the track, the scroll and what is open are the first's.
+ * Three files a shot, one in each theme: `name.jpg` in Terminal, as the app
+ * is served, `name-liquid.jpg` and `name-paper.jpg`. A theme is CSS under
+ * `data-theme` on the root, so the second and third are the same page a
+ * second later with the attribute changed, not another visit: the track, the
+ * scroll and what is open are the first's. Liquid and Paper are stored as
+ * `dark` and `light`.
+ *
+ * A release before Terminal is served in Liquid, and its first file is Liquid.
  */
 async function shoot(page, name) {
 	// The player holds a connection open, so the network never goes idle; wait
@@ -214,16 +218,21 @@ async function shoot(page, name) {
 			return i.complete || box.bottom < 0 || box.top > innerHeight || box.width === 0;
 		})
 	);
-	// The room's colour eases over 900ms after a track or a page changes.
+	// The room's colour eases over 900ms after a track or a page changes, and
+	// a new track's title resolves over 340ms in Terminal.
 	await page.waitForTimeout(1600);
+	const served = await page.evaluate(() => document.documentElement.dataset.theme);
 	await page.screenshot({ path: `${OUT}/${name}.jpg`, type: 'jpeg', quality: 86 });
-	await page.evaluate(() => (document.documentElement.dataset.theme = 'light'));
-	// Controls ease to the new theme's colours over 220ms.
-	await page.waitForTimeout(1000);
-	await page.screenshot({ path: `${OUT}/${name}-light.jpg`, type: 'jpeg', quality: 86 });
-	await page.evaluate(() => (document.documentElement.dataset.theme = 'dark'));
+	for (const [theme, suffix] of [['dark', 'liquid'], ['light', 'paper']]) {
+		if (theme === served) continue;
+		await page.evaluate((theme) => (document.documentElement.dataset.theme = theme), theme);
+		// Controls ease to the new theme's colours over 220ms.
+		await page.waitForTimeout(1000);
+		await page.screenshot({ path: `${OUT}/${name}-${suffix}.jpg`, type: 'jpeg', quality: 86 });
+	}
+	await page.evaluate((theme) => (document.documentElement.dataset.theme = theme), served);
 	await page.waitForTimeout(400);
-	console.log(`${name}.jpg, ${name}-light.jpg`);
+	console.log(`${name}.jpg, ${name}-liquid.jpg, ${name}-paper.jpg`);
 }
 
 /**
