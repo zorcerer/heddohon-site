@@ -387,7 +387,7 @@ docker compose up -d
 docker compose logs heddohon</code></pre>
 					</div>
 					<dl class="facts">
-						<div data-reveal="rise"><dt>Open</dt><dd><code>http://localhost:3000</code>, enter the setup code from the log, and give the address of your music server. Then sign in with your music server account. To configure it by environment variables instead, see <a href="https://github.com/zorcerer/heddohon/wiki/Configuration">Configuration</a>. To expose it publicly, read <a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md">SECURITY.md</a>.</dd></div>
+						<div data-reveal="rise"><dt>Open</dt><dd><code>http://localhost:3000</code>, enter the setup code from the log, and give the address of your music server. Then sign in with your music server account. To put it on the internet, follow <a href="https://github.com/zorcerer/heddohon/blob/main/SETUP.md">SETUP.md</a>.</dd></div>
 						<div data-reveal="rise"><dt>Images</dt><dd><code>ghcr.io/zorcerer/heddohon</code> and <code>zorcererd/heddohon</code></dd></div>
 						<div data-reveal="rise"><dt>Platforms</dt><dd><code>linux/amd64</code> and <code>linux/arm64</code>: a Raspberry Pi 4 or 5 on a 64-bit OS, an ARM NAS, an Ampere server. 32-bit ARM is not built.</dd></div>
 						<div data-reveal="rise"><dt>Tags</dt><dd><code>latest</code> is the newest release. <code>dev</code> is built from the <code>dev</code> branch once a day when it has changed and passed the test suites.</dd></div>
@@ -401,6 +401,7 @@ docker compose logs heddohon</code></pre>
 			<section id="docs" class="section">
 				<h2 class="section-head" data-reveal="sweep"><span class="index">05</span>Documentation<span class="rule"></span></h2>
 				<ul class="docs">
+					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/blob/main/SETUP.md"><span>Setup</span><span class="leader"></span><em>Starting it, the setup page, and putting it on the internet</em></a></li>
 					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Configuration"><span>Configuration</span><span class="leader"></span><em>Environment variables, reverse proxies, PostgreSQL, Unraid</em></a></li>
 					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Apps"><span>Apps</span><span class="leader"></span><em>The desktop app for Linux and Windows, the Android app, and a sign-in in front of them</em></a></li>
 					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md"><span>Security</span><span class="leader"></span><em>Threat model, known gaps, reporting a vulnerability</em></a></li>
