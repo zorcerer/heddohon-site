@@ -130,7 +130,7 @@
 			<!-- Each name is on the page below. `site.js` doubles the run for the loop. -->
 			<div class="ticker" aria-hidden="true">
 				<div class="ticker-run">
-					<span>Navidrome</span><span>Subsonic</span><span>Jellyfin</span><span>FLAC 24/192</span><span>Opus</span><span>AAC</span><span>MP3</span><span>Chromecast</span><span>AirPlay</span><span>LRCLIB</span><span>AutoEq</span><span>SQLite</span><span>PostgreSQL</span><span>linux/amd64</span><span>linux/arm64</span><span>Linux</span><span>Windows</span><span>Android</span><span>MIT</span>
+					<span>Navidrome</span><span>Subsonic</span><span>Jellyfin</span><span>FLAC 24/192</span><span>Opus</span><span>AAC</span><span>MP3</span><span>Chromecast</span><span>AirPlay</span><span>LRCLIB</span><span>AutoEq</span><span>linux/amd64</span><span>linux/arm64</span><span>Linux</span><span>Windows</span><span>Android</span><span>MIT</span>
 				</div>
 			</div>
 
@@ -147,10 +147,10 @@
 							<div class="reactions"><span>🔥</span><span>❤️</span><span>👏</span><span>😂</span><span>🎉</span></div>
 						</div>
 						<p class="pillar-label"><span class="index">a</span>Listen together</p>
-						<h3>Play for people who are not in the room</h3>
+						<h3>Listen together, like a Spotify Jam</h3>
 						<p>
-							Start a session and send its link. Everyone who opens it hears what you play, as you play it, in their
-							own browser and without an account, and can answer with reactions.
+							Send a link, and everyone who opens it hears what you play, as you play it, without an account.
+							Friends with an account on your music server can add tracks to the queue.
 						</p>
 						<dl class="pillar-facts">
 							<div><dt>Listeners</dt><dd>up to 50</dd></div>
@@ -166,9 +166,8 @@
 						<p class="pillar-label"><span class="index">b</span>Shared links</p>
 						<h3>A song, an album or a playlist, for anyone with the link</h3>
 						<p>
-							The link plays that one item in the browser, with its cover and the original file, and nothing else in
-							your library. Pasted into a chat, it shows its title and cover. Withdraw it from Settings and streams
-							already playing through it stop.
+							It plays that one item, with its cover and the original file, and shows both when pasted into a chat.
+							Withdraw it, and streams playing through it stop.
 						</p>
 						<dl class="pillar-facts">
 							<div><dt>Lasts</dt><dd>1, 7 or 30 days</dd></div>
@@ -189,8 +188,8 @@
 						<p class="pillar-label"><span class="index">c</span>Security</p>
 						<h3>Your music server stays off the internet</h3>
 						<p>
-							The browser only talks to Heddohon, which fetches every byte from the music server itself. The upstream
-							address appears in no page, script or error. The threat model, the known gaps and each audit are in
+							The browser only talks to Heddohon, which fetches every byte from the music server. Its address appears in
+							no page, script or error. The details are in
 							<a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md">SECURITY.md</a>.
 						</p>
 						<dl class="pillar-facts">
@@ -217,7 +216,7 @@
 							</ol>
 						</div>
 						<h3>Play anything from the keyboard</h3>
-						<p>In Terminal, press <code>⌘K</code> or <code>Ctrl K</code> anywhere, or <code>:</code>, and type what you want to hear. <code>play kind of blue</code> starts the best match, <code>queue artist:miles</code> adds to the queue, and <code>mix</code> plays music like what is on. Albums, artists and songs are suggested as you type. The same line seeks, sets the volume and the sleep timer, rates, favourites, goes to any page and changes the theme; <code>help</code> lists every command.</p>
+						<p>In Terminal, press <code>⌘K</code> or <code>Ctrl K</code> anywhere and type what you want to hear: <code>play</code> and a name starts the best match. Queueing, mixes, seeking and the volume work the same way.</p>
 					</article>
 					<article class="cell cell--5 pane" data-reveal="rise" data-live>
 						<div class="vig vig-quality" aria-hidden="true">
@@ -225,7 +224,7 @@
 							<div class="seek"><i></i></div>
 						</div>
 						<h3>Original files</h3>
-						<p>Up to FLAC 24/192, with the decoded format shown in the player. Optional transcoding to MP3, Opus or AAC from the quality badge. Casts to Chromecast and AirPlay.</p>
+						<p>Up to FLAC 24/192, or transcoded to MP3, Opus or AAC. Casts to Chromecast and AirPlay.</p>
 					</article>
 					<article class="cell cell--7 pane" data-reveal="rise">
 						<div class="vig vig-tint" role="group" aria-label="Colour the page as a cover would">
@@ -238,7 +237,7 @@
 							<button class="swatch" type="button" aria-pressed="false" aria-label="Rose" data-h="338" data-s="38" data-l="54" style="--h: 338"></button>
 						</div>
 						<h3>Four themes, coloured by the artwork</h3>
-						<p>Terminal is flat panes on hairlines, a mono face and a dot grid, in nine editor colour schemes, with a command line on <code>:</code> or <code>Ctrl K</code>. Liquid is dark glass, Paper is parchment and ink, and Phosphor is lit like the display of a car stereo. In each, the accent is the colour of the cover that is playing; Terminal can hold one colour of your own instead. This page does the same with its screenshots. Press a square above to colour it by hand; the theme switch is in the top bar.</p>
+						<p>Terminal, Liquid, Paper and Phosphor. In each, the accent is the colour of the cover that is playing. This page does the same; press a square above to colour it by hand, or switch the theme in the top bar.</p>
 					</article>
 					<article class="cell cell--4 pane" data-reveal="rise" data-live>
 						<div class="vig vig-lyrics" aria-hidden="true">
@@ -249,7 +248,7 @@
 							</div>
 						</div>
 						<h3>Synced lyrics</h3>
-						<p>From your music server, or from LRCLIB when you turn it on. A living-room screen shows what plays full screen with the lyrics, for a TV across the room.</p>
+						<p>From your music server, or from LRCLIB. A full-screen view shows them on a TV across the room.</p>
 					</article>
 					<article class="cell cell--4 pane" data-reveal="rise" data-live>
 						<div class="vig vig-devices" aria-hidden="true">
@@ -258,21 +257,16 @@
 							<span class="device device--phone"><span class="bars"><i></i><i></i><i></i><i></i></span></span>
 						</div>
 						<h3>One app across your devices</h3>
-						<p>A desktop app for Linux and Windows and an experimental one for Android, on each release, and it installs from the browser on a Mac, an iPhone and an iPad. The queue and settings follow you, and one browser can pause, skip or take over the queue of another.</p>
+						<p>Desktop apps for Linux and Windows, an experimental Android app, and an install from the browser on a Mac, an iPhone and an iPad. One browser can pause, skip or take over the queue of another.</p>
 					</article>
 					<article class="cell cell--4 pane" data-reveal="rise" data-live>
 						<div class="vig vig-eq" aria-hidden="true" data-eq>
 							<span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span><span class="band"><i></i></span>
 						</div>
 						<h3>An equaliser that knows your headphones</h3>
-						<p>Ten bands, kept per browser, with a correction for one of about 8,850 headphones measured by AutoEq, or from a ParametricEQ.txt of your own. Crossfades leave the joins of an album alone.</p>
+						<p>Ten bands, with a correction for one of about 8,850 headphones measured by AutoEq.</p>
 					</article>
-					<article class="cell cell--4 pane" data-reveal="rise" data-live>
-						<div class="vig vig-radio" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
-						<h3>Internet radio</h3>
-						<p>The stations Navidrome lists, played through your server, from a stream address or an .m3u or .pls playlist.</p>
-					</article>
-					<article class="cell cell--4 pane" data-reveal="rise" data-live>
+					<article class="cell cell--5 pane" data-reveal="rise" data-live>
 						<!-- The figures and the shape of the chart are those of the Your listening screenshot below. -->
 						<div class="vig vig-hours" aria-hidden="true" data-hours>
 							<p class="tally"><span><b data-count="581">581</b> plays</span><span><b data-count="36">36</b> hours</span></p>
@@ -281,40 +275,9 @@
 							</div>
 						</div>
 						<h3>Your listening, on your server</h3>
-						<p>Every play kept in Heddohon's own database: top artists, albums and hours, and the albums you played on this date in earlier years. Instant mixes of up to 100 similar tracks, and daily mixes made each day from the artists you play most.</p>
-					</article>
-					<article class="cell cell--4 pane" data-reveal="rise" data-live>
-						<div class="vig vig-servers" aria-hidden="true"><span>Navidrome</span><span>Subsonic</span><span>Jellyfin</span></div>
-						<h3>Navidrome, Subsonic or Jellyfin</h3>
-						<p>Signs in with the music server's own accounts, and links each album and artist to MusicBrainz and Last.fm where the server knows them. SQLite by default, or PostgreSQL.</p>
+						<p>Every play kept on your server: top artists, albums and hours, what you played on this day in earlier years, and daily mixes made from it.</p>
 					</article>
 					<article class="cell cell--7 pane" data-reveal="rise" data-live>
-						<!-- The track and the cover are those of the Album screenshot below. -->
-						<div class="vig vig-post" aria-hidden="true">
-							<div class="post">
-								<p class="post-who"><i></i>Now playing<b>app</b></p>
-								<div class="embed">
-									<p class="embed-title">Contrapunctus 1</p>
-									<p class="embed-lines">Kimiko Ishizaka<br />J.S. Bach: The Art of the Fugue</p>
-									<p class="embed-foot">Heddohon</p>
-									<span class="embed-cover"></span>
-								</div>
-							</div>
-						</div>
-						<h3>What you play, posted to a Discord channel</h3>
-						<p>Link a channel's webhook in Settings and each track played past half its length, or four minutes, is posted there with its cover. The cover is uploaded with the post, and nothing in it gives the address of your server. ListenBrainz takes a token from each account. Both are off until the server's operator turns them on.</p>
-					</article>
-					<article class="cell cell--5 pane" data-reveal="rise" data-live>
-						<div class="vig vig-covers" aria-hidden="true">
-							<div class="tiles">
-								<i style="--n: 0"></i><i style="--n: 1"></i><i style="--n: 2"></i><i style="--n: 3"></i><i style="--n: 4"></i><i style="--n: 5"></i><i style="--n: 6"></i><i style="--n: 7"></i><i style="--n: 8"></i><i style="--n: 9"></i><i style="--n: 10"></i><i style="--n: 11"></i><i style="--n: 12"></i><i style="--n: 13"></i>
-							</div>
-							<div class="seek"><i></i></div>
-						</div>
-						<h3>Covers cached before anyone opens them</h3>
-						<p>A cover is kept on the server the first time it is fetched. An administrator can cache every cover in the library from Settings and have it kept filled each day, so a new device does not wait for the music server to render them.</p>
-					</article>
-					<article class="cell cell--12 pane" data-reveal="rise" data-live>
 						<!-- The names are made up. The tracks are the ones playing in the screenshots below. -->
 						<div class="vig vig-heard" aria-hidden="true">
 							<div class="heard" style="--turn: -35; --from: 0.82; --to: 0.3">
@@ -332,7 +295,7 @@
 							<div class="heads-pill"><span class="bars"><i></i><i></i><i></i></span><span class="faces"><i></i><i></i><i></i></span></div>
 						</div>
 						<h3>See what the others are playing</h3>
-						<p>Accounts on the same Heddohon can show each other what they are playing, under a display name and a picture set in Settings. While someone is listening, a pill of pictures sits at the foot of the page, and opens a list of each listener's track with how far in it is, a link to the album, and buttons to play it or queue it yourself. Every account is off until it turns it on, and nothing of it is stored: a pause takes you out of the list.</p>
+						<p>Accounts that turn it on see what each other is playing, and can play or queue it themselves.</p>
 					</article>
 				</div>
 			</section>
@@ -441,9 +404,7 @@ docker compose logs heddohon</code></pre>
 					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Configuration"><span>Configuration</span><span class="leader"></span><em>Environment variables, reverse proxies, PostgreSQL, Unraid</em></a></li>
 					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Apps"><span>Apps</span><span class="leader"></span><em>The desktop app for Linux and Windows, the Android app, and a sign-in in front of them</em></a></li>
 					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md"><span>Security</span><span class="leader"></span><em>Threat model, known gaps, reporting a vulnerability</em></a></li>
-					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Audio"><span>Audio</span><span class="leader"></span><em>Formats, transcoding, and what high resolution means in a browser</em></a></li>
-					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Architecture"><span>Architecture</span><span class="leader"></span><em>How the server, the client and the music server fit together</em></a></li>
-					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki/Design-notes"><span>Design notes</span><span class="leader"></span><em>Why the interface looks and behaves as it does</em></a></li>
+					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/wiki"><span>Wiki</span><span class="leader"></span><em>Audio, architecture and design notes</em></a></li>
 					<li data-reveal="rise"><a href="https://github.com/zorcerer/heddohon/blob/main/CONTRIBUTING.md"><span>Contributing</span><span class="leader"></span><em>Reporting bugs, suggesting features, and sending pull requests</em></a></li>
 				</ul>
 			</section>

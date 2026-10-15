@@ -2237,7 +2237,7 @@ h1 span {
 	}
 }
 
-/* Listening now: the last cell, the width of the grid at every size. After
+/* The command line: the first cell, the width of the grid at every size. After
    the rules above that set a cell's span, so it holds on a narrow screen. */
 .cell--12 {
 	grid-column: 1 / -1;
