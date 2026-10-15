@@ -224,8 +224,8 @@
 							<button class="swatch" type="button" aria-pressed="false" aria-label="Violet" data-h="276" data-s="34" data-l="56" style="--h: 276"></button>
 							<button class="swatch" type="button" aria-pressed="false" aria-label="Rose" data-h="338" data-s="38" data-l="54" style="--h: 338"></button>
 						</div>
-						<h3>Three themes, coloured by the artwork</h3>
-						<p>Terminal is flat panes on hairlines, a mono face and a dot grid. Liquid is dark glass, and Paper is parchment and ink. In each, the accent is the colour of the cover that is playing; Terminal can hold one colour of your own instead. This page does the same with its screenshots. Press a square above to colour it by hand; the theme switch is in the top bar.</p>
+						<h3>Four themes, coloured by the artwork</h3>
+						<p>Terminal is flat panes on hairlines, a mono face and a dot grid, in nine editor colour schemes, with a command line on <code>:</code> or <code>Ctrl K</code>. Liquid is dark glass, Paper is parchment and ink, and Phosphor is lit like the display of a car stereo. In each, the accent is the colour of the cover that is playing; Terminal can hold one colour of your own instead. This page does the same with its screenshots. Press a square above to colour it by hand; the theme switch is in the top bar.</p>
 					</article>
 					<article class="cell cell--4 pane" data-reveal="rise" data-live>
 						<div class="vig vig-lyrics" aria-hidden="true">
@@ -268,12 +268,12 @@
 							</div>
 						</div>
 						<h3>Your listening, on your server</h3>
-						<p>Every play kept in Heddohon's own database: top artists, albums and hours, and the albums you played on this date in earlier years. Instant mixes of up to 100 similar tracks.</p>
+						<p>Every play kept in Heddohon's own database: top artists, albums and hours, and the albums you played on this date in earlier years. Instant mixes of up to 100 similar tracks, and daily mixes made each day from the artists you play most.</p>
 					</article>
 					<article class="cell cell--4 pane" data-reveal="rise" data-live>
 						<div class="vig vig-servers" aria-hidden="true"><span>Navidrome</span><span>Subsonic</span><span>Jellyfin</span></div>
 						<h3>Navidrome, Subsonic or Jellyfin</h3>
-						<p>Signs in with the music server's own accounts. SQLite by default, or PostgreSQL.</p>
+						<p>Signs in with the music server's own accounts, and links each album and artist to MusicBrainz and Last.fm where the server knows them. SQLite by default, or PostgreSQL.</p>
 					</article>
 					<article class="cell cell--7 pane" data-reveal="rise" data-live>
 						<!-- The track and the cover are those of the Album screenshot below. -->
@@ -407,13 +407,11 @@
 							<button class="key key--small copy" type="button" data-copy="quickstart"><span>Copy</span></button>
 						</div>
 <pre id="quickstart"><code>git clone https://github.com/zorcerer/heddohon.git && cd heddohon
-cp .env.example .env
-echo "HEDDOHON_SECRET=$(openssl rand -base64 48)" >> .env
-echo "HEDDOHON_SUBSONIC_URL=http://10.0.0.10:4533" >> .env
-docker compose up -d</code></pre>
+docker compose up -d
+docker compose logs heddohon</code></pre>
 					</div>
 					<dl class="facts">
-						<div data-reveal="rise"><dt>Open</dt><dd><code>http://localhost:3000</code>, and sign in with your music server account. To expose it publicly, set <code>ORIGIN</code> and read <a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md">SECURITY.md</a>.</dd></div>
+						<div data-reveal="rise"><dt>Open</dt><dd><code>http://localhost:3000</code>, enter the setup code from the log, and give the address of your music server. Then sign in with your music server account. To configure it by environment variables instead, see <a href="https://github.com/zorcerer/heddohon/wiki/Configuration">Configuration</a>. To expose it publicly, read <a href="https://github.com/zorcerer/heddohon/blob/main/SECURITY.md">SECURITY.md</a>.</dd></div>
 						<div data-reveal="rise"><dt>Images</dt><dd><code>ghcr.io/zorcerer/heddohon</code> and <code>zorcererd/heddohon</code></dd></div>
 						<div data-reveal="rise"><dt>Platforms</dt><dd><code>linux/amd64</code> and <code>linux/arm64</code>: a Raspberry Pi 4 or 5 on a 64-bit OS, an ARM NAS, an Ampere server. 32-bit ARM is not built.</dd></div>
 						<div data-reveal="rise"><dt>Tags</dt><dd><code>latest</code> is the newest release. <code>dev</code> is built from the <code>dev</code> branch once a day when it has changed and passed the test suites.</dd></div>
