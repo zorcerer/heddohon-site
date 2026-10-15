@@ -2249,6 +2249,166 @@ h1 span {
 }
 
 /*
+ * The command line, as Terminal draws it in the path strip: a line typed out a
+ * key at a time, the suggestions arriving under it, and the first taken. One
+ * 7-second loop, paused off screen like the others. The styles without the
+ * animation are its last frame, the whole scene, which is where reduced motion
+ * leaves it.
+ */
+.vig-command {
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: flex-start;
+	gap: var(--space-2);
+	padding: var(--space-4);
+	font: 500 0.75rem/1.5 var(--font-mono);
+}
+
+.cmd-line {
+	display: flex;
+	align-items: center;
+	gap: 0.6ch;
+	max-width: 34rem;
+	padding: 0.4rem var(--space-3);
+	border-radius: var(--r-sm);
+	border: 1px solid var(--border-strong);
+	background: var(--control-face);
+}
+
+.cmd-mark {
+	color: var(--accent);
+	font-weight: 600;
+}
+
+.cmd-typed {
+	overflow: hidden;
+	width: 18ch;
+	white-space: nowrap;
+	color: var(--text-strong);
+	animation: cmd-type 7s infinite;
+}
+
+.cmd-key {
+	margin-left: auto;
+	padding: 0 0.5ch;
+	border-radius: 3px;
+	border: 1px solid var(--border-hairline);
+	color: var(--text-faint);
+	font-size: 0.6875rem;
+}
+
+.cmd-list {
+	display: grid;
+	gap: 2px;
+	max-width: 34rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cmd-list li {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: var(--space-3);
+	padding: 0.2rem var(--space-3);
+	border-radius: var(--r-sm);
+	color: var(--text-default);
+	animation: cmd-row-2 7s infinite;
+}
+
+.cmd-list li span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.cmd-list li i {
+	color: var(--text-faint);
+	font-style: normal;
+}
+
+.cmd-list li:first-child {
+	background: var(--accent);
+	color: var(--accent-contrast);
+	animation-name: cmd-pick;
+}
+
+.cmd-list li:first-child i {
+	color: inherit;
+	opacity: 0.75;
+}
+
+.cmd-list li:nth-child(3) {
+	animation-name: cmd-row-3;
+}
+
+@keyframes cmd-type {
+	0%,
+	4% {
+		width: 0;
+		animation-timing-function: steps(18, end);
+	}
+	30%,
+	100% {
+		width: 18ch;
+	}
+}
+
+@keyframes cmd-pick {
+	0%,
+	34% {
+		opacity: 0;
+		background: transparent;
+		color: var(--text-default);
+	}
+	38%,
+	54% {
+		opacity: 1;
+		background: transparent;
+		color: var(--text-default);
+	}
+	58%,
+	94% {
+		opacity: 1;
+		background: var(--accent);
+		color: var(--accent-contrast);
+	}
+	100% {
+		opacity: 0;
+		background: var(--accent);
+		color: var(--accent-contrast);
+	}
+}
+
+@keyframes cmd-row-2 {
+	0%,
+	38% {
+		opacity: 0;
+	}
+	42%,
+	94% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes cmd-row-3 {
+	0%,
+	42% {
+		opacity: 0;
+	}
+	46%,
+	94% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+/*
  * Three listeners as the app's popup lists them, each picture in a ring that
  * fills as the track plays, and the pill of pictures the popup opens from,
  * with the app's playing bars. A ring runs its stretch of the track in five
