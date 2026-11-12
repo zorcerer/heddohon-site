@@ -71,12 +71,13 @@ async function album(pattern) {
 	return (await subsonic('getAlbum', { id: found.id })).album;
 }
 
-const fugue = await album(/Art of the Fugue/);
+// Chosen for their covers, which the site takes its colour from.
+const accumulation = await album(/Accumulation/);
+const slamFunk = await album(/Slam Funk/);
+const lightYears = await album(/^Light Years/);
+const wryWay = await album(/Wry Way/);
 const stars = await album(/^Addressed to the Stars$/);
 const wings = await album(/^Dirty Wings$/);
-const whispering = await album(/^Only Whispering$/);
-const machine = await album(/^The Beautiful Machine$/);
-const wake = await album(/^The Wake$/);
 
 // ── Heddohon ───────────────────────────────────────────────────────────────
 await until('Heddohon', async () => (await fetch(`${APP}/healthz`)).ok);
@@ -195,7 +196,7 @@ async function seedPlays(favourite) {
 	database.close();
 	console.log(`seeded ${plays.length} plays`);
 }
-await seedPlays(wake);
+await seedPlays(wryWay);
 
 let current;
 
@@ -261,7 +262,7 @@ try {
 	// ── Desktop ────────────────────────────────────────────────────────────
 	const page = await desktop.newPage();
 
-	await play(page, fugue, 0, 99);
+	await play(page, accumulation, 0, 99);
 	await shoot(page, 'album');
 
 	// LRCLIB has synced lyrics for this song; Heddohon fetches them with
@@ -279,18 +280,17 @@ try {
 	await shoot(page, 'recommendations');
 
 	// Your listening, over the plays seeded above. Reached by its links, since
-	// loading the address would stop what is playing. The rail holds the link
-	// in 0.4, and Recently played holds it as a tab after.
-	await play(page, wake, 0, 30);
-	const listening = page.locator('a[href="/stats"]').first();
-	if (!(await listening.count())) await page.locator('a[href="/history"]').first().click();
-	await listening.click();
+	// loading the address would stop what is playing.
+	await play(page, wryWay, 0, 30);
+	// The rail links to History, which holds Your listening in its segmented control.
+	await page.locator('nav.rail a[href="/history"]').click();
+	await page.getByRole('radio', { name: 'Your listening' }).click();
 	// The two charts are drawn in the browser, in its time zone.
 	await page.locator('.when').waitFor();
 	await page.mouse.move(80, 940);
 	await shoot(page, 'listening');
 
-	await play(page, whispering, 0, 0);
+	await play(page, slamFunk, 0, 0);
 	await page.getByRole('button', { name: 'Share a link to this song' }).click();
 	await page.getByRole('button', { name: 'Create link' }).click();
 	const url = await page.locator('dialog input.url').inputValue();
@@ -305,7 +305,8 @@ try {
 
 	// ── Phone ──────────────────────────────────────────────────────────────
 	const small = await phone.newPage();
-	await play(small, machine, 0, 48, { tap: true });
+	// Light Years and not Slam Funk, whose second track's title is not for the front page.
+	await play(small, lightYears, 0, 48, { tap: true });
 	await small.evaluate(() => scrollTo(0, 0));
 	await shoot(small, 'phone-album');
 

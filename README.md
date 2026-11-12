@@ -50,7 +50,7 @@ HEDDOHON_IMAGE=ghcr.io/zorcerer/heddohon:dev screenshots/run.sh
 HEDDOHON_IMAGE=heddohon:local screenshots/run.sh              # an image built on this machine
 ```
 
-It downloads a library into the Docker volume `hh-shots-library` (3.8 GB, kept
+It downloads a library into the Docker volume `hh-shots-library` (5.8 GB, kept
 for the next run), starts a Navidrome and a Heddohon on a network of their own,
 scans the library, and captures five desktop pages at 1440x960 and two phone
 pages at 393x852 with Playwright. Each is taken three times: `name.jpg` in Terminal,
@@ -71,6 +71,18 @@ The library is freely licensed music:
 - Kimiko Ishizaka, J.S. Bach: The Art of the Fugue, 24-bit FLAC from the
   [Internet Archive](https://archive.org/details/pandacd-715-js-bach-the-art-of-the-fugue-kunst-der-fuge-bwv-1080),
   [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+- From the Internet Archive, chosen for their covers, each CC BY under its
+  own metadata: Stellardrone, [Light Years](https://archive.org/details/Stellardrone-LightYears)
+  and [Invent the Universe](https://archive.org/details/Stellardrone-InventTheUniverse-CC-BY);
+  Lezet, [Accumulation](https://archive.org/details/bof066); Grove of Whispers,
+  [The Sheltering Sky](https://archive.org/details/bof060) and [Vast](https://archive.org/details/bof056);
+  Tale Twist, [Wry Way](https://archive.org/details/tranz060TaleTwist-WryWay);
+  Chump Change, [Footage / East](https://archive.org/details/yarn014);
+  [happy in novi sad](https://archive.org/details/unfound88) (unfound88); in
+  FLAC, and Broke For Free, [Slam Funk](https://archive.org/details/Slam_Funk-7603),
+  in MP3. Tale Twist and Chump Change come untagged, and `library.sh` tags
+  them from their file names. Where an item has no front cover, the cover is
+  the artwork in its first file.
 
 Lyrics come from LRCLIB through Heddohon's `HEDDOHON_LYRICS_LRCLIB`.
 

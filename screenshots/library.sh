@@ -6,6 +6,11 @@
 #   Josh Woodward     every song on joshwoodward.com, CC BY 4.0, MP3
 #   Kimiko Ishizaka   J.S. Bach: The Art of the Fugue, CC0, 24-bit FLAC, from
 #                     the Internet Archive
+#   From the Internet Archive, for their covers, each CC BY under its own
+#   metadata: Stellardrone (Light Years, Invent the Universe), Lezet
+#   (Accumulation), Grove of Whispers (The Sheltering Sky, Vast), Tale Twist
+#   (Wry Way), Chump Change (Footage / East), the unfound88 compilation (happy
+#   in novi sad), in FLAC; Broke For Free (Slam Funk), in MP3
 set -eu
 
 apk add --no-cache curl jq ffmpeg >/dev/null
@@ -73,6 +78,67 @@ jq -r --arg item "$ITEM" '
 ' /tmp/item.json > /tmp/fugue.tsv
 echo "The Art of the Fugue: $(wc -l < /tmp/fugue.tsv) files"
 fetch_all 10 < /tmp/fugue.tsv
+
+# An album from the Internet Archive: its files of one format, and its cover,
+# named. Where the item has no front of its own, the cover is the artwork in
+# the first file, at its own size: the pictures the Archive takes from the
+# files are thumbnails of 6 to 9 KB, and Slam Funk's came out black.
+archive_album() {
+	item=$1 dir=$2 format=$3 cover=$4
+	mkdir -p "/music/$dir"
+	cd "/music/$dir"
+	curl -sf "https://archive.org/metadata/$item" > /tmp/item.json
+	jq -r --arg item "$item" --arg format "$format" --arg cover "$cover" '
+		(.files[] | select(.format == $format) | "https://archive.org/download/\($item)/\(.name | @uri)\t\(.name)"),
+		(.files[] | select($cover != "" and .name == $cover)
+			| "https://archive.org/download/\($item)/\(.name | @uri)\tcover.\(.name | split(".") | last | ascii_downcase)")
+	' /tmp/item.json > /tmp/album.tsv
+	echo "$dir: $(wc -l < /tmp/album.tsv) files"
+	fetch_all 8 < /tmp/album.tsv
+	if [ -z "$cover" ] && [ ! -s cover.jpg ]; then
+		rm -f cover.png
+		first=$(ls *.flac *.mp3 2>/dev/null | head -1)
+		ffmpeg -v error -y -i "$first" -an -frames:v 1 cover.jpg || echo "$dir: no artwork in $first" >&2
+	fi
+}
+# Sets the album and its artist on every file of a folder, copied without
+# re-encoding. With "names", the files carry no tags at all (Tale Twist, Chump
+# Change), and the artist, the title and the track come from the file name:
+# "01.TaleTwist-BirdsMigration.flac" is track 1, "Birds Migration". The
+# unfound88 compilation carries an album artist per track, which split it
+# into an album each. `.tagged` marks a folder done.
+tag_album() {
+	dir=/music/$1 album=$2 album_artist=$3 names=${4:-}
+	[ -e "$dir/.tagged" ] && return
+	for f in "$dir"/*.flac "$dir"/*.mp3; do
+		[ -e "$f" ] || continue
+		set -- -metadata album="$album" -metadata album_artist="$album_artist"
+		[ "$album_artist" = 'Various Artists' ] && set -- "$@" -metadata compilation=1
+		if [ -n "$names" ]; then
+			name=$(basename "${f%.*}")
+			track=$(echo "$name" | sed -n 's/^\([0-9][0-9]*\).*/\1/p' | sed 's/^0*//')
+			title=$(echo "$name" | sed 's/^[0-9]*[ ._-]*//; s/^[^-]*-//; s/_/ /g; s/\([a-z]\)\([A-Z]\)/\1 \2/g')
+			set -- "$@" -metadata artist="$album_artist" -metadata title="$title" -metadata track="$track"
+		fi
+		ext=${f##*.}
+		ffmpeg -v error -y -i "$f" -map 0 -c copy "$@" -f "$([ "$ext" = mp3 ] && echo mp3 || echo flac)" "$f.part" && mv "$f.part" "$f"
+	done
+	touch "$dir/.tagged"
+	echo "$1: tagged"
+}
+
+archive_album Stellardrone-LightYears stellardrone/light-years Flac ''
+archive_album Stellardrone-InventTheUniverse-CC-BY stellardrone/invent-the-universe Flac ''
+archive_album bof066 lezet/accumulation Flac 00_Lezet_-_Accumulation_01_front.jpg
+archive_album bof060 grove-of-whispers/the-sheltering-sky Flac 00_Grove_of_Whispers_-_The_Sheltering_Sky_01_front.jpg
+archive_album bof056 grove-of-whispers/vast Flac 00_Grove_of_Whispers_-_Vast_01_front.jpg
+archive_album tranz060TaleTwist-WryWay tale-twist/wry-way Flac 01.tranz060CoverFront.jpg
+archive_album yarn014 chump-change/footage-east Flac yarn014-artwork.png
+archive_album unfound88 unfound/happy-in-novi-sad Flac unfound88.jpg
+archive_album Slam_Funk-7603 broke-for-free/slam-funk 'VBR MP3' ''
+tag_album tale-twist/wry-way 'Wry Way' 'Tale Twist' names
+tag_album chump-change/footage-east 'Footage / East' 'Chump Change' names
+tag_album unfound/happy-in-novi-sad 'happy in novi sad' 'Various Artists'
 
 incomplete=$(find /music -name '*.part' | wc -l)
 echo "Library: $(du -sh /music | cut -f1), $incomplete incomplete"
